@@ -1,13 +1,16 @@
 # Docs for the Azure Web Apps Deploy action: https://github.com/Azure/webapps-deploy
 # More GitHub Actions for Azure: https://github.com/Azure/actions
 
-name: Build and deploy JAR app to Azure Web App - kino-kea
+name: Build and deploy App
 
 on:
   push:
     branches:
       - main
   workflow_dispatch:
+
+env:
+  TOKEN_SECRET: ${{ secrets.TOKEN_SECRET }}
 
 jobs:
   build:
@@ -29,6 +32,7 @@ jobs:
         with:
           name: java-app
           path: '${{ github.workspace }}/target/*.jar'
+          retention-days: 1
 
   deploy:
     runs-on: ubuntu-latest
