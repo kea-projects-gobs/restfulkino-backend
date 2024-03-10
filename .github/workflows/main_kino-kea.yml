@@ -8,6 +8,9 @@ on:
 
 env:
   TOKEN_SECRET: ${{ secrets.TOKEN_SECRET }}
+  JDBC_DATABASE_URL: ${{ secrets.JDBC_DATABASE_URL }}
+  JDBC_USERNAME: ${{ secrets.JDBC_USERNAME }}
+  JDBC_PASSWORD: ${{ secrets.JDBC_PASSWORD }}
 
 jobs:
   build:
