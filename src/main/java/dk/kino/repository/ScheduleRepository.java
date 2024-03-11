@@ -9,9 +9,11 @@ import java.time.LocalDate;
 import java.util.List;
 
 public interface ScheduleRepository extends JpaRepository<Schedule,Integer> {
-    @Query("SELECT s FROM Schedule s WHERE s.date = :date AND s.movie.id = :movieId")
-    List<Schedule> findByDateAndMovieId(@Param("date") LocalDate date, @Param("movieId") int movieId);
+//    @Query("SELECT s FROM Schedule s WHERE s.date = :date AND s.movie.id = :movieId")
+//    List<Schedule> findByDateAndMovieId(@Param("date") LocalDate date, @Param("movieId") int movieId);
 
 //    // TODO: Add when Movie Entity is created
 //    List<Schedule> findByDateAndMovie(LocalDate date, Movie movie);
+
+    List<Schedule> findByDate(LocalDate date);
 }
