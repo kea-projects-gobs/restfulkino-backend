@@ -1,5 +1,6 @@
 package dk.kino.service.impl;
 
+import dk.kino.dto.ScheduleDto;
 import dk.kino.entity.Schedule;
 import dk.kino.repository.ScheduleRepository;
 import dk.kino.service.ScheduleService;
@@ -7,6 +8,7 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class ScheduleServiceImpl implements ScheduleService {
@@ -18,30 +20,33 @@ public class ScheduleServiceImpl implements ScheduleService {
     }
 
     @Override
-    public List<Schedule> findAll() {
-        return scheduleRepository.findAll();
+    public List<ScheduleDto> findAll() {
+        return scheduleRepository.findAll().stream().map(this::toDto).collect(Collectors.toList());
     }
 
     @Override
-    public List<Schedule> findByDate(LocalDate date) {
-        return scheduleRepository.findByDate(date);
+    public List<ScheduleDto> findByDate(LocalDate date) {
+        return scheduleRepository.findByDate(date).stream().map(this::toDto).collect(Collectors.toList());
     }
 
     @Override
-    public List<Schedule> findByDateAndMovieId(LocalDate date, int movieId) {
+    public List<ScheduleDto> findByDateAndMovieId(LocalDate date, int movieId) {
         return null;
     }
 
     @Override
-    public Schedule create(Schedule schedule) {
+    public ScheduleDto create(ScheduleDto scheduleDto) {
         // TODO: Add Validation to the schedule object
-        return scheduleRepository.save(schedule);
+        return toDto(scheduleRepository.save(toEntity(scheduleDto)));
     }
 
     @Override
-    public Schedule update(int id,Schedule schedule) {
+    public ScheduleDto update(int id,ScheduleDto scheduleDto) {
         // Find schedule
         Schedule originalSchedule = scheduleRepository.findById(id).orElseThrow(() -> new RuntimeException(("Unable to find schedule with id=" + id)));
+
+        // Map to entity
+        Schedule schedule = toEntity(scheduleDto);
 
         // Update original schedule
         originalSchedule.setDate(schedule.getDate());
@@ -50,12 +55,32 @@ public class ScheduleServiceImpl implements ScheduleService {
         originalSchedule.setHelaften(schedule.isHelaften());
 
         // Persist
-        return scheduleRepository.save(originalSchedule);
+        return toDto(scheduleRepository.save(originalSchedule));
     }
 
     @Override
     public void delete(int id) {
         Schedule schedule = scheduleRepository.findById(id).orElseThrow(() -> new RuntimeException(("Unable to find schedule with id=" + id)));
         scheduleRepository.delete(schedule);
+    }
+
+    private ScheduleDto toDto(Schedule schedule) {
+        return ScheduleDto.builder()
+                .id(schedule.getId())
+                .date(schedule.getDate())
+                .startTime(schedule.getStartTime())
+                .is3d(schedule.is3d())
+                .isHelaften(schedule.isHelaften())
+                .build();
+    }
+
+    private Schedule toEntity(ScheduleDto scheduleDto) {
+        return Schedule.builder()
+                .id(scheduleDto.getId())
+                .date(scheduleDto.getDate())
+                .startTime(scheduleDto.getStartTime())
+                .is3d(scheduleDto.is3d())
+                .isHelaften(scheduleDto.isHelaften())
+                .build();
     }
 }

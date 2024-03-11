@@ -1,6 +1,7 @@
 package dk.kino.api;
 
 
+import dk.kino.dto.ScheduleDto;
 import dk.kino.entity.Schedule;
 import dk.kino.service.ScheduleService;
 import org.springframework.http.HttpStatus;
@@ -21,28 +22,28 @@ public class ScheduleController {
     }
 
     @GetMapping
-    public ResponseEntity<List<Schedule>> getSchedules() {
+    public ResponseEntity<List<ScheduleDto>> getSchedules() {
         return ResponseEntity.ok().body(scheduleService.findAll());
     }
 
     @GetMapping("/{date}")
-    public ResponseEntity<List<Schedule>> getSchedulesByDate(@PathVariable LocalDate date) {
+    public ResponseEntity<List<ScheduleDto>> getSchedulesByDate(@PathVariable LocalDate date) {
         return ResponseEntity.ok().body(scheduleService.findByDate(date));
     }
 
     @GetMapping("/{date}/movies/{movieId}")
-    public ResponseEntity<List<Schedule>> getSchedulesByDateAndMovieId(@PathVariable LocalDate date, @PathVariable int movieId) {
+    public ResponseEntity<List<ScheduleDto>> getSchedulesByDateAndMovieId(@PathVariable LocalDate date, @PathVariable int movieId) {
         return ResponseEntity.ok().body(scheduleService.findByDateAndMovieId(date,movieId));
     }
 
     @PostMapping
-    public ResponseEntity<Schedule> createSchedule(@RequestBody Schedule schedule) {
-        return ResponseEntity.status(HttpStatus.CREATED).body(scheduleService.create(schedule));
+    public ResponseEntity<ScheduleDto> createSchedule(@RequestBody ScheduleDto scheduleDto) {
+        return ResponseEntity.status(HttpStatus.CREATED).body(scheduleService.create(scheduleDto));
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<Schedule> updateSchedule(@PathVariable int id, @RequestBody Schedule schedule) {
-        return ResponseEntity.ok().body(scheduleService.update(id,schedule));
+    public ResponseEntity<ScheduleDto> updateSchedule(@PathVariable int id, @RequestBody ScheduleDto scheduleDto) {
+        return ResponseEntity.ok().body(scheduleService.update(id,scheduleDto));
     }
 
     @DeleteMapping("/{id}")
