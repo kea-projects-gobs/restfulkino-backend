@@ -6,6 +6,8 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.util.List;
+
 @Entity
 @Getter
 @Setter
@@ -29,6 +31,9 @@ public class Cinema {
     private String phone;
     private String email;
     private String imageUrl;
+
+    @OneToMany(mappedBy = "cinema", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Hall> halls;
 
     public Cinema(String name, String city, String street, String description, String phone, String email, String imageUrl) {
         this.name = name;
