@@ -77,8 +77,10 @@ public class CinemaServiceImpl implements CinemaService {
         dto.setEmail(cinema.getEmail());
         dto.setImageUrl(cinema.getImageUrl());
         // convert halls to HallDTOs and set them
-        List<HallDTO> hallDTOs = cinema.getHalls().stream().map(hall -> (HallDTO) hallService.convertHallToDTO(hall)).collect(Collectors.toList());
-        dto.setHalls(hallDTOs);
+        if (cinema.getHalls() != null){
+            List<HallDTO> hallDTOs = cinema.getHalls().stream().map(hall -> (HallDTO) hallService.convertHallToDTO(hall)).collect(Collectors.toList());
+            dto.setHalls(hallDTOs);
+        }
         return dto;
     }
 

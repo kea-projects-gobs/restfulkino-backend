@@ -1,27 +1,33 @@
 package dk.kino.configuration;
 
 import dk.kino.entity.Cinema;
+import dk.kino.entity.Hall;
 import dk.kino.repository.CinemaRepository;
+import dk.kino.repository.HallRepository;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.NoSuchElementException;
 
 import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.ApplicationRunner;
 import org.springframework.stereotype.Component;
 
 @Component
-public class SetupCinemas implements ApplicationRunner {
+public class SetupCinemasAndHalls implements ApplicationRunner {
 
     private CinemaRepository cinemaRepository;
+    private HallRepository hallRepository;
 
-    public SetupCinemas(CinemaRepository cinemaRepository) {
+    public SetupCinemasAndHalls(CinemaRepository cinemaRepository, HallRepository hallRepository) {
         this.cinemaRepository = cinemaRepository;
+        this.hallRepository = hallRepository;
     }
 
     @Override
     public void run(ApplicationArguments args) throws Exception {
         createCinemas();
+        createHalls();
     }
 
     private void createCinemas() {
@@ -42,6 +48,18 @@ public class SetupCinemas implements ApplicationRunner {
         );
 
         cinemas.forEach(cinemaRepository::save);
+        // Ensure cinemas are persisted and available in DB before creating halls
+        cinemaRepository.flush();
+    }
+
+        private void createHalls() {
+        List<Hall> halls = Arrays.asList(
+            new Hall("Hall 1", 10, 10, "random.com", cinemaRepository.findById(2).orElseThrow(() -> new NoSuchElementException("Cinema with ID 2 not found"))),
+            new Hall("Hall 2", 10, 10, "random.com", cinemaRepository.findById(2).orElseThrow(() -> new NoSuchElementException("Cinema with ID 2 not found"))),
+            new Hall("Hall 3", 10, 10, "random.com", cinemaRepository.findById(3).orElseThrow(() -> new NoSuchElementException("Cinema with ID 3 not found"))),
+            new Hall("Hall 4", 10, 10, "random.com", cinemaRepository.findById(4).orElseThrow(() -> new NoSuchElementException("Cinema with ID 4 not found")))
+        );
+        hallRepository.saveAll(halls);
     }
 
 }

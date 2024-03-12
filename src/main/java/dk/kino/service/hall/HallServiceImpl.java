@@ -71,7 +71,9 @@ public class HallServiceImpl implements HallService {
         dto.setNoOfRows(hall.getNoOfRows());
         dto.setNoOfColumns(hall.getNoOfColumns());
         dto.setImageUrl(hall.getImageUrl());
-        dto.setCinemaId(hall.getCinema().getId());
+        if (hall.getCinema() != null){
+            dto.setCinemaId(hall.getCinema().getId());
+        }
         return dto;
     }
 
