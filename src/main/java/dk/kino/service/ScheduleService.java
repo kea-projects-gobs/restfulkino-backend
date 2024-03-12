@@ -10,6 +10,7 @@ public interface ScheduleService {
     List<ScheduleDto> findAll();
     List<ScheduleDto> findByDate(LocalDate date);
     List<ScheduleDto> findByDateAndMovieId(LocalDate date, int movieId);
+    List<ScheduleDto> findByDateAndCinemaName(LocalDate date, String cinemaName);
     ScheduleDto create(ScheduleDto scheduleDto);
     ScheduleDto update(int id, ScheduleDto scheduleDto);
     void delete(int id);

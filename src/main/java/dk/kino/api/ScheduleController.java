@@ -27,12 +27,14 @@ public class ScheduleController {
     }
 
     @GetMapping("/{date}")
-    public ResponseEntity<List<ScheduleDto>> getSchedulesByDate(@PathVariable LocalDate date) {
+    public ResponseEntity<List<ScheduleDto>> getSchedulesByDate(@PathVariable("date") LocalDate date){
         return ResponseEntity.ok().body(scheduleService.findByDate(date));
     }
 
     @GetMapping("/{date}/movies/{movieId}")
-    public ResponseEntity<List<ScheduleDto>> getSchedulesByDateAndMovieId(@PathVariable LocalDate date, @PathVariable int movieId) {
+    public ResponseEntity<List<ScheduleDto>> getSchedulesByDateAndMovieId(@PathVariable("date") LocalDate date, @PathVariable("movieId") int movieId
+//    ,@RequestParam(value = "cinemaName", required = false) String cinemaName
+    ) {
         return ResponseEntity.ok().body(scheduleService.findByDateAndMovieId(date,movieId));
     }
 

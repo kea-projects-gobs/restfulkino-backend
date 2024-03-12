@@ -26,11 +26,17 @@ public class ScheduleServiceImpl implements ScheduleService {
 
     @Override
     public List<ScheduleDto> findByDate(LocalDate date) {
-        return scheduleRepository.findByDate(date).stream().map(this::toDto).collect(Collectors.toList());
+            return scheduleRepository.findByDate(date).stream().map(this::toDto).collect(Collectors.toList());
     }
 
     @Override
     public List<ScheduleDto> findByDateAndMovieId(LocalDate date, int movieId) {
+        return null;
+    }
+
+    @Override
+    public List<ScheduleDto> findByDateAndCinemaName(LocalDate date, String cinemaName) {
+//        return scheduleRepository.findByDateAndCinemaName(date,cinemaName).stream().map(this::toDto).collect(Collectors.toList());
         return null;
     }
 
