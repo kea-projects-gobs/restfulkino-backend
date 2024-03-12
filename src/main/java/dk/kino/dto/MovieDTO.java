@@ -1,14 +1,14 @@
 package dk.kino.dto;
 
 
-import lombok.Getter;
-import lombok.Setter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 
 @Getter
 @Setter
 @NoArgsConstructor
+@AllArgsConstructor
+@Builder
 public class MovieDTO {
     private int id;
     private String title;
