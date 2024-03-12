@@ -21,4 +21,8 @@ public class Hall {
     private int noOfRows;
     private int noOfColumns;
     private String imageUrl;
+
+    @ManyToOne
+    @JoinColumn(name = "cinema_id")
+    private Cinema cinema;
 }
