@@ -4,6 +4,8 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.util.List;
+
 @Getter
 @Setter
 @NoArgsConstructor
@@ -16,4 +18,5 @@ public class CinemaDTO {
     private String phone;
     private String email;
     private String imageUrl;
+    private List<HallDTO> halls;
 }
