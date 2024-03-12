@@ -12,6 +12,6 @@ public interface HallService {
     HallDTO createHall(HallDTO hallDTO);
     HallDTO updateHall(int id, HallDTO hallDTO);
     void deleteHall(int id);
-    Object convertToDTO(Hall hall);
+    Object convertHallToDTO(Hall hall);
     Hall convertToEntity(HallDTO hallDTO);
 }

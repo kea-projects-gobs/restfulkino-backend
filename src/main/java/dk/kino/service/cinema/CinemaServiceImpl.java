@@ -1,8 +1,11 @@
 package dk.kino.service.cinema;
 
 import dk.kino.dto.CinemaDTO;
+import dk.kino.dto.HallDTO;
 import dk.kino.entity.Cinema;
+import dk.kino.entity.Hall;
 import dk.kino.repository.CinemaRepository;
+import dk.kino.service.hall.HallService;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -13,11 +16,12 @@ import java.util.stream.Collectors;
 public class CinemaServiceImpl implements CinemaService {
 
     private CinemaRepository cinemaRepository;
+    private HallService hallService;
 
-    public CinemaServiceImpl(CinemaRepository cinemaRepository) {
+    public CinemaServiceImpl(CinemaRepository cinemaRepository, HallService hallService) {
         this.cinemaRepository = cinemaRepository;
+        this.hallService = hallService;
     }
-
     @Override
     public List<CinemaDTO> findAll() {
         return cinemaRepository.findAll().stream().map(this::convertToDTO).collect(Collectors.toList());
@@ -72,9 +76,13 @@ public class CinemaServiceImpl implements CinemaService {
         dto.setPhone(cinema.getPhone());
         dto.setEmail(cinema.getEmail());
         dto.setImageUrl(cinema.getImageUrl());
+        // convert halls to HallDTOs and set them
+        List<HallDTO> hallDTOs = cinema.getHalls().stream().map(hall -> (HallDTO) hallService.convertHallToDTO(hall)).collect(Collectors.toList());
+        dto.setHalls(hallDTOs);
         return dto;
     }
 
+    
     @Override
     public Cinema convertToEntity(CinemaDTO cinemaDTO) {
         Cinema cinema = new Cinema();
