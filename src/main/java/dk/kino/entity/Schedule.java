@@ -22,12 +22,12 @@ public class Schedule {
     private boolean is3d;
     private boolean isHelaften;
     // TODO: Add when Movie entity is created
-//    @ManyToOne
-//    @JoinColumn(name = "movie_id", nullable = false)
-//    private Movie movie;
+    @ManyToOne
+    @JoinColumn(name = "movie_id", nullable = false)
+    private Movie movie;
 
     // TODO: Add when Hall entity is created
-//    @ManyToOne
-//    @JoinColumn(name = "hall_id", nullable = false)
-//    private Hall hall;
+    @ManyToOne
+    @JoinColumn(name = "hall_id", nullable = false)
+    private Hall hall;
 }
