@@ -3,29 +3,35 @@ package dk.kino.configuration;
 import dk.kino.entity.Cinema;
 import dk.kino.entity.Hall;
 import dk.kino.entity.Movie;
+import dk.kino.entity.Schedule;
 import dk.kino.repository.CinemaRepository;
 import dk.kino.repository.HallRepository;
 
+import java.time.LocalDate;
+import java.time.LocalTime;
 import java.util.Arrays;
 import java.util.List;
 import java.util.NoSuchElementException;
 
 import dk.kino.repository.MovieRepository;
+import dk.kino.repository.ScheduleRepository;
 import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.ApplicationRunner;
 import org.springframework.stereotype.Component;
 
 @Component
-public class SetupCinemasAndHalls implements ApplicationRunner {
+public class SetupData implements ApplicationRunner {
 
-    private CinemaRepository cinemaRepository;
-    private HallRepository hallRepository;
-    private MovieRepository movieRepository;
+    private final CinemaRepository cinemaRepository;
+    private final HallRepository hallRepository;
+    private final MovieRepository movieRepository;
+    private final ScheduleRepository scheduleRepository;
 
-    public SetupCinemasAndHalls(CinemaRepository cinemaRepository, HallRepository hallRepository, MovieRepository movieRepository) {
+    public SetupData(CinemaRepository cinemaRepository, HallRepository hallRepository, MovieRepository movieRepository, ScheduleRepository scheduleRepository) {
         this.cinemaRepository = cinemaRepository;
         this.hallRepository = hallRepository;
         this.movieRepository = movieRepository;
+        this.scheduleRepository = scheduleRepository;
     }
 
     @Override
@@ -33,6 +39,7 @@ public class SetupCinemasAndHalls implements ApplicationRunner {
         createCinemas();
         createHalls();
         createMovies();
+        createSchedules();
     }
 
     private void createCinemas() {
@@ -52,7 +59,7 @@ public class SetupCinemasAndHalls implements ApplicationRunner {
             new Cinema("Animation Station", "Toon Town", "1010 Animation Ave", "Animated adventures for all ages.", "000-111-2222", "animation@station.com", "https://batterseapowerstation.co.uk/content/uploads/2022/08/Cinema-in-the-Power-Station-image001hero-1600x869.jpg")
         );
 
-        cinemas.forEach(cinemaRepository::save);
+        cinemaRepository.saveAll(cinemas);
         // Ensure cinemas are persisted and available in DB before creating halls
         cinemaRepository.flush();
     }
@@ -86,6 +93,45 @@ public class SetupCinemasAndHalls implements ApplicationRunner {
             new Movie("Snack Shack", "A drama that unfolds in a small town snack shack.", "2024-08-08", 98, "https://upload.wikimedia.org/wikipedia/en/thumb/d/d5/Snack_Shack_poster.jpg/220px-Snack_Shack_poster.jpg", "English", "Drama/Comedy", "N/A", "N/A")
         );
         movieRepository.saveAll(movies);
+    }
+
+    private void createSchedules() {
+        List<Schedule> schedules = Arrays.asList(
+                Schedule.builder()
+                        .date(LocalDate.parse("2024-03-13"))
+                        .is3d(false)
+                        .isHelaften(false)
+                        .startTime(LocalTime.parse("22:00:00"))
+                        .movie(movieRepository.findById(1).orElseThrow(() -> new NoSuchElementException("Movie with ID 1 not found")))
+                        .hall(hallRepository.findById(1).orElseThrow(() -> new NoSuchElementException("Hall with ID 1 not found")))
+                        .build(),
+                Schedule.builder()
+                        .date(LocalDate.parse("2024-03-14"))
+                        .is3d(false)
+                        .isHelaften(false)
+                        .startTime(LocalTime.parse("22:00:00"))
+                        .movie(movieRepository.findById(1).orElseThrow(() -> new NoSuchElementException("Movie with ID 1 not found")))
+                        .hall(hallRepository.findById(1).orElseThrow(() -> new NoSuchElementException("Hall with ID 1 not found")))
+                        .build(),
+                Schedule.builder()
+                        .date(LocalDate.parse("2024-03-15"))
+                        .is3d(false)
+                        .isHelaften(false)
+                        .startTime(LocalTime.parse("22:00:00"))
+                        .movie(movieRepository.findById(1).orElseThrow(() -> new NoSuchElementException("Movie with ID 1 not found")))
+                        .hall(hallRepository.findById(1).orElseThrow(() -> new NoSuchElementException("Hall with ID 1 not found")))
+                        .build(),
+                Schedule.builder()
+                        .date(LocalDate.parse("2024-03-13"))
+                        .is3d(false)
+                        .isHelaften(false)
+                        .startTime(LocalTime.parse("22:00:00"))
+                        .movie(movieRepository.findById(2).orElseThrow(() -> new NoSuchElementException("Movie with ID 2 not found")))
+                        .hall(hallRepository.findById(2).orElseThrow(() -> new NoSuchElementException("Hall with ID 2 not found")))
+                        .build()
+
+        );
+        scheduleRepository.saveAll(schedules);
     }
 
 }
