@@ -31,11 +31,10 @@ public class ScheduleController {
         return ResponseEntity.ok().body(scheduleService.findByDate(date));
     }
 
-    @GetMapping("/{date}/movies/{movieId}")
-    public ResponseEntity<List<ScheduleDto>> getSchedulesByDateAndMovieId(@PathVariable("date") LocalDate date, @PathVariable("movieId") int movieId
-//    ,@RequestParam(value = "cinemaName", required = false) String cinemaName
-    ) {
-        return ResponseEntity.ok().body(scheduleService.findByDateAndMovieId(date,movieId));
+    @GetMapping("/{date}/movies/{movieId}/cinemas/{cinemasId}")
+    public ResponseEntity<List<ScheduleDto>> getSchedulesByDateAndCinemaIdAndMovieId(
+            @PathVariable("date") LocalDate date, @PathVariable("movieId") int movieId, @PathVariable("cinemasId") int cinemaId) {
+        return ResponseEntity.ok().body(scheduleService.findByDateAndMovieIdAndCinemaId(date,movieId,cinemaId));
     }
 
     @PostMapping

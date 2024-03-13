@@ -9,8 +9,7 @@ import java.util.List;
 public interface ScheduleService {
     List<ScheduleDto> findAll();
     List<ScheduleDto> findByDate(LocalDate date);
-    List<ScheduleDto> findByDateAndMovieId(LocalDate date, int movieId);
-    List<ScheduleDto> findByDateAndCinemaName(LocalDate date, String cinemaName);
+    List<ScheduleDto> findByDateAndMovieIdAndCinemaId(LocalDate date, int movieId,int cinemaId);
     ScheduleDto create(ScheduleDto scheduleDto);
     ScheduleDto update(int id, ScheduleDto scheduleDto);
     void delete(int id);
