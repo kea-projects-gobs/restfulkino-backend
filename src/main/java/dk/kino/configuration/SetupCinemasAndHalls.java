@@ -85,7 +85,7 @@ public class SetupCinemasAndHalls implements ApplicationRunner {
             new Movie("Oppenheimer", "A mystery thriller that delves into the mind of J. Robert Oppenheimer.", "2024-07-16", 150, "https://image.tmdb.org/t/p/w300/8Gxv8gSFCU0XGDykEGv7zR1n2ua.jpg", "English", "Thriller/Mystery", "Christopher Nolan", "Cillian Murphy"),
             new Movie("Snack Shack", "A drama that unfolds in a small town snack shack.", "2024-08-08", 98, "https://upload.wikimedia.org/wikipedia/en/thumb/d/d5/Snack_Shack_poster.jpg/220px-Snack_Shack_poster.jpg", "English", "Drama/Comedy", "N/A", "N/A")
         );
-        movies.forEach(movieRepository::save);
+        movieRepository.saveAll(movies);
     }
 
 }
