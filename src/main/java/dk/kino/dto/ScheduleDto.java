@@ -16,6 +16,7 @@ public class ScheduleDto {
     private LocalDate date;
     private boolean is3d;
     private boolean isHelaften;
-//    private String movieName;
-//    private String hallName;
+    private String movieTitle;
+    private String hallName;
+    private String cinemaName;
 }
