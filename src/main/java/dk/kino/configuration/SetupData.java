@@ -96,38 +96,48 @@ public class SetupData implements ApplicationRunner {
     }
 
     private void createSchedules() {
+        Movie movie1 = movieRepository.findById(1).orElseThrow(() -> new NoSuchElementException("Movie with ID 1 not found"));
+        Movie movie2 = movieRepository.findById(2).orElseThrow(() -> new NoSuchElementException("Movie with ID 2 not found"));
+//        Movie movie3 = movieRepository.findById(3).orElseThrow(() -> new NoSuchElementException("Movie with ID 3 not found"));
+        Hall hall1 = hallRepository.findById(1).orElseThrow(() -> new NoSuchElementException("Hall with ID 1 not found"));
+        Hall hall2 = hallRepository.findById(2).orElseThrow(() -> new NoSuchElementException("Hall with ID 1 not found"));
+//        Hall hall3 = hallRepository.findById(3).orElseThrow(() -> new NoSuchElementException("Hall with ID 1 not found"));
         List<Schedule> schedules = Arrays.asList(
                 Schedule.builder()
                         .date(LocalDate.parse("2024-03-13"))
                         .is3d(false)
-                        .isHelaften(false)
-                        .startTime(LocalTime.parse("22:00:00"))
-                        .movie(movieRepository.findById(1).orElseThrow(() -> new NoSuchElementException("Movie with ID 1 not found")))
-                        .hall(hallRepository.findById(1).orElseThrow(() -> new NoSuchElementException("Hall with ID 1 not found")))
+                        .isLongMovie(false)
+                        .startTime(LocalTime.parse("18:00:00"))
+                        .endTime(LocalTime.parse("22:00:00").plusMinutes(movie1.getDuration()))
+                        .movie(movie1)
+                        .hall(hall1)
                         .build(),
                 Schedule.builder()
                         .date(LocalDate.parse("2024-03-14"))
                         .is3d(false)
-                        .isHelaften(false)
-                        .startTime(LocalTime.parse("22:00:00"))
-                        .movie(movieRepository.findById(1).orElseThrow(() -> new NoSuchElementException("Movie with ID 1 not found")))
-                        .hall(hallRepository.findById(1).orElseThrow(() -> new NoSuchElementException("Hall with ID 1 not found")))
+                        .isLongMovie(false)
+                        .startTime(LocalTime.parse("10:00:00"))
+                        .endTime(LocalTime.parse("10:00:00").plusMinutes(movie1.getDuration()))
+                        .movie(movie1)
+                        .hall(hall1)
                         .build(),
                 Schedule.builder()
                         .date(LocalDate.parse("2024-03-15"))
                         .is3d(false)
-                        .isHelaften(false)
+                        .isLongMovie(false)
                         .startTime(LocalTime.parse("22:00:00"))
-                        .movie(movieRepository.findById(1).orElseThrow(() -> new NoSuchElementException("Movie with ID 1 not found")))
-                        .hall(hallRepository.findById(1).orElseThrow(() -> new NoSuchElementException("Hall with ID 1 not found")))
+                        .endTime(LocalTime.parse("22:00:00").plusMinutes(movie1.getDuration()))
+                        .movie(movie1)
+                        .hall(hall1)
                         .build(),
                 Schedule.builder()
                         .date(LocalDate.parse("2024-03-13"))
                         .is3d(false)
-                        .isHelaften(false)
-                        .startTime(LocalTime.parse("22:00:00"))
-                        .movie(movieRepository.findById(2).orElseThrow(() -> new NoSuchElementException("Movie with ID 2 not found")))
-                        .hall(hallRepository.findById(2).orElseThrow(() -> new NoSuchElementException("Hall with ID 2 not found")))
+                        .isLongMovie(false)
+                        .startTime(LocalTime.parse("21:00:00"))
+                        .endTime(LocalTime.parse("21:00:00").plusMinutes(movie2.getDuration()))
+                        .movie(movie2)
+                        .hall(hall2)
                         .build()
 
         );
