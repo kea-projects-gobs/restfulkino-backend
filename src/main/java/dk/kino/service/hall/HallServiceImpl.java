@@ -33,6 +33,13 @@ public class HallServiceImpl implements HallService {
     }
 
     @Override
+    public HallDTO findByNameAndCinemaName(String hallName, String cinemaName) {
+        Optional<Hall> hall = hallRepository.findByNameAndCinemaName(hallName,cinemaName);
+        return hall.map(this::convertHallToDTO).orElse(null);
+    }
+
+
+    @Override
     public HallDTO createHall(HallDTO hallDTO) {
         Hall hall = convertToEntity(hallDTO);
         cinemaRepository.findById(hallDTO.getCinemaId()).ifPresent(hall::setCinema);

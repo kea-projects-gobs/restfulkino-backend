@@ -3,6 +3,8 @@ package dk.kino.entity;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.util.List;
+
 @Entity
 @Getter
 @Setter
@@ -35,6 +37,9 @@ public class Movie {
     private String director;
 
     private String cast;
+
+    @OneToMany(mappedBy = "movie")
+    private List<Schedule> schedules;
 
 
     public Movie(String title, String description, String releaseDate, int duration, String imageUrl, String language, String genre, String director, String cast) {

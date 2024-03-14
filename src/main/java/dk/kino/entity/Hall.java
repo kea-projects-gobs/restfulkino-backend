@@ -6,6 +6,8 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.util.List;
+
 @Entity
 @Getter
 @Setter
@@ -25,6 +27,9 @@ public class Hall {
     @ManyToOne
     @JoinColumn(name = "cinema_id")
     private Cinema cinema;
+
+    @OneToMany(mappedBy = "hall")
+    private List<Schedule> schedules;
 
     public Hall(String name, int noOfRows, int noOfColumns, String imageUrl, Cinema cinema) {
         this.name = name;

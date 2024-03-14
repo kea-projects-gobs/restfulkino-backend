@@ -9,6 +9,7 @@ public interface HallService {
 
     List<HallDTO> findAll();
     HallDTO findById(int id);
+    HallDTO findByNameAndCinemaName(String hallName, String cinemaName);
     HallDTO createHall(HallDTO hallDTO);
     HallDTO updateHall(int id, HallDTO hallDTO);
     void deleteHall(int id);

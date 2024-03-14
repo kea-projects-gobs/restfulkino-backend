@@ -67,7 +67,7 @@ public class MovieServiceImpl implements MovieService {
         movieRepository.delete(movie);
     }
 
-    private MovieDTO toDto(Movie movie) {
+    public MovieDTO toDto(Movie movie) {
         return MovieDTO.builder()
                 .id(movie.getId())
                 .title(movie.getTitle())
@@ -82,7 +82,7 @@ public class MovieServiceImpl implements MovieService {
                 .build();
     }
 
-    private Movie toEntity(MovieDTO movieDTO) {
+    public Movie toEntity(MovieDTO movieDTO) {
         return Movie.builder()
                 .id(movieDTO.getId())
                 .title(movieDTO.getTitle())
