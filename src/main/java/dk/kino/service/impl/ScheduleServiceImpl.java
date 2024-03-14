@@ -82,7 +82,8 @@ public class ScheduleServiceImpl implements ScheduleService {
 
     private void validateScheduleUniqueness(Schedule schedule) {
         int countConflicts = scheduleRepository.countSchedulesByDateAndHallAndTimeSpan(
-                schedule.getHall().getId(),schedule.getStartTime(),schedule.getEndTime(),schedule.getDate()
+                schedule.getHall().getId(),schedule.getStartTime(),schedule.getEndTime(),schedule.getDate(),
+                schedule.getId() != null ? schedule.getId() : -1 // Passes the current schedule's ID (so that we can PUT this) and uses -1 if null
         );
         if (countConflicts>0) {
             throw new RuntimeException("Schedule already exists.");

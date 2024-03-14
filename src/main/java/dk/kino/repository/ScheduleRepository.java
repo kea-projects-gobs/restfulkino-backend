@@ -47,11 +47,13 @@ public interface ScheduleRepository extends JpaRepository<Schedule,Integer> {
             "AND s.hall.id = :hallId " +
             "AND ((s.startTime >= :startTime AND s.startTime < :endTime) " +
             "OR (s.endTime > :startTime AND s.endTime <= :endTime) " +
-            "OR (s.startTime < :startTime AND s.endTime > :endTime))")
+            "OR (s.startTime < :startTime AND s.endTime > :endTime))" +
+            "AND s.id <> :scheduleId") //Exclude the current schedule
     int countSchedulesByDateAndHallAndTimeSpan(
             @Param("hallId") int hallId,
             @Param("startTime") LocalTime startTime,
             @Param("endTime") LocalTime endTime,
-            @Param("date") LocalDate date
+            @Param("date") LocalDate date,
+            @Param("scheduleId") int scheduleId
     );
 }
