@@ -18,9 +18,10 @@ public class Schedule {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
     private LocalTime startTime;
+    private LocalTime endTime;
     private LocalDate date;
     private boolean is3d;
-    private boolean isHelaften;
+    private boolean isLongMovie;
     // TODO: Add when Movie entity is created
     @ManyToOne
     @JoinColumn(name = "movie_id", nullable = false)
