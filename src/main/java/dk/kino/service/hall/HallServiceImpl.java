@@ -95,4 +95,10 @@ public class HallServiceImpl implements HallService {
         hall.setCinema(cinemaRepository.findById(hallDTO.getCinemaId()).orElse(null));
         return hall;
     }
+
+    @Override
+    public List<HallDTO> findHallsByCinemaId(int cinemaId) {
+        List<Hall> halls = hallRepository.findByCinemaId(cinemaId);
+        return halls.stream().map(this::convertHallToDTO).collect(Collectors.toList());
+    }
 }

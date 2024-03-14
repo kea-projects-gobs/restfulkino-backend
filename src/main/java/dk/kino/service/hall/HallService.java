@@ -15,4 +15,5 @@ public interface HallService {
     void deleteHall(int id);
     Object convertHallToDTO(Hall hall);
     Hall convertToEntity(HallDTO hallDTO);
+    List<HallDTO> findHallsByCinemaId(int cinemaId);
 }

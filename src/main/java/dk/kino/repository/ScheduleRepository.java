@@ -14,6 +14,7 @@ public interface ScheduleRepository extends JpaRepository<Schedule,Integer> {
     @Query("SELECT s FROM Schedule s JOIN s.hall h JOIN s.movie m WHERE h.cinema.id = :cinemaId AND s.date = :date AND m.id = :movieId ORDER BY s.startTime")
     List<Schedule> findByDateAndMovieIdAndCinemaId(@Param("date") LocalDate date, @Param("cinemaId") int cinemaId, @Param("movieId") int movieId);
     List<Schedule> findByDate(LocalDate date);
+    List<Schedule> findByMovieId(int movieId);
 //    @Query("SELECT s FROM Schedule s JOIN s.hall h JOIN h.cinema c WHERE h.name = :hallName AND c.name = :cinemaName AND s.startTime = :startTime AND s.date = :date")
 //    List<Schedule> findByHallNameAndCinemaNameAndStartTimeAndDate(
 //            @Param("hallName") String hallName,
