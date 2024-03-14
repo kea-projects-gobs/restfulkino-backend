@@ -3,6 +3,7 @@ package dk.kino.entity;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.time.LocalDate;
 import java.util.List;
 
 @Entity
@@ -23,7 +24,7 @@ public class Movie {
     @Column(nullable = false)
     private String description;
 
-    private String releaseDate;
+    private LocalDate releaseDate;
 
     private int duration;
 
@@ -42,7 +43,7 @@ public class Movie {
     private List<Schedule> schedules;
 
 
-    public Movie(String title, String description, String releaseDate, int duration, String imageUrl, String language, String genre, String director, String cast) {
+    public Movie(String title, String description, LocalDate releaseDate, int duration, String imageUrl, String language, String genre, String director, String cast) {
         this.title = title;
         this.description = description;
         this.releaseDate = releaseDate;

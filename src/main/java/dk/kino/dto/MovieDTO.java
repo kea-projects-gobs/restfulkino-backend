@@ -3,6 +3,8 @@ package dk.kino.dto;
 
 import lombok.*;
 
+import java.time.LocalDate;
+
 
 @Getter
 @Setter
@@ -13,7 +15,7 @@ public class MovieDTO {
     private int id;
     private String title;
     private String description;
-    private String releaseDate;
+    private LocalDate releaseDate;
     private int duration;
     private String imageUrl;
     private String language;
