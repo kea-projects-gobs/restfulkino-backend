@@ -4,12 +4,15 @@ import dk.kino.dto.CinemaDTO;
 import dk.kino.dto.HallDTO;
 import dk.kino.entity.Cinema;
 import dk.kino.entity.Hall;
+import dk.kino.entity.Schedule;
 import dk.kino.repository.CinemaRepository;
+import dk.kino.repository.ScheduleRepository;
 import dk.kino.service.hall.HallService;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 @Service
@@ -17,11 +20,14 @@ public class CinemaServiceImpl implements CinemaService {
 
     private CinemaRepository cinemaRepository;
     private HallService hallService;
+    private ScheduleRepository scheduleRepository;
 
-    public CinemaServiceImpl(CinemaRepository cinemaRepository, HallService hallService) {
+    public CinemaServiceImpl(CinemaRepository cinemaRepository, HallService hallService, ScheduleRepository scheduleRepository) {
         this.cinemaRepository = cinemaRepository;
         this.hallService = hallService;
+        this.scheduleRepository = scheduleRepository;
     }
+
     @Override
     public List<CinemaDTO> findAll() {
         return cinemaRepository.findAll().stream().map(this::convertToDTO).collect(Collectors.toList());
@@ -96,5 +102,13 @@ public class CinemaServiceImpl implements CinemaService {
         cinema.setEmail(cinemaDTO.getEmail());
         cinema.setImageUrl(cinemaDTO.getImageUrl());
         return cinema;
+    }
+
+    @Override
+    public List<CinemaDTO> findCinemasByMovieId(int movieId) {
+        List<Schedule> schedules = scheduleRepository.findByMovieId(movieId);
+        Set<Cinema> cinemas = schedules.stream().map(schedule -> schedule.getHall().getCinema())
+        .collect(Collectors.toSet());
+        return cinemas.stream().map(this::convertToDTO).collect(Collectors.toList());
     }
 }

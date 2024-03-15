@@ -29,6 +29,12 @@ public class HallController {
         return ResponseEntity.ok(hall);
     }
 
+    @GetMapping("/cinema/{cinemaId}")
+    public ResponseEntity<List<HallDTO>> findHallsByCinemaId(@PathVariable int cinemaId) {
+        List<HallDTO> halls = hallService.findHallsByCinemaId(cinemaId);
+        return ResponseEntity.ok(halls);
+    }
+
     @PostMapping
     public ResponseEntity<HallDTO> addHall(@RequestBody HallDTO hallDTO) {
         HallDTO createHall = hallService.createHall(hallDTO);

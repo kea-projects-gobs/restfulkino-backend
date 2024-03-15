@@ -24,9 +24,15 @@ public class CinemaController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<CinemaDTO> findCinemaById(@PathVariable int id) {
-        CinemaDTO cinema = cinemaService.findById(id);
+    public ResponseEntity<CinemaDTO> findCinemaById(@PathVariable int movieId) {
+        CinemaDTO cinema = cinemaService.findById(movieId);
         return ResponseEntity.ok(cinema);
+    }
+
+    @GetMapping("/movie/{movieId}")
+    public ResponseEntity<List<CinemaDTO>> findCinemasByMovieId(@PathVariable int movieId) {
+        List<CinemaDTO> cinemas = cinemaService.findCinemasByMovieId(movieId);
+        return ResponseEntity.ok(cinemas);
     }
 
     @PostMapping

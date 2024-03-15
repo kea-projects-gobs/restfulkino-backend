@@ -8,7 +8,6 @@ import java.util.List;
 
 public interface CinemaService {
     List<CinemaDTO> findAll();
-    //CinemaDTO findByName(String name);
     CinemaDTO findById(int id);
     CinemaDTO createCinema(CinemaDTO cinemaDTO);
     CinemaDTO updateCinema(int id, CinemaDTO cinemaDTO);
@@ -18,5 +17,6 @@ public interface CinemaService {
 
     Cinema convertToEntity(CinemaDTO cinemaDTO);
 
+    List<CinemaDTO> findCinemasByMovieId(int movieId);
 
 }
