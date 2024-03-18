@@ -2,7 +2,7 @@ package dk.kino.configuration;
 
 import dk.kino.dto.CinemaDTO;
 import dk.kino.dto.MovieDTO;
-import dk.kino.dto.ScheduleDto;
+import dk.kino.dto.ScheduleDTO;
 import dk.kino.entity.Cinema;
 import dk.kino.entity.Hall;
 import dk.kino.entity.Movie;
@@ -94,7 +94,7 @@ public class SetupData implements ApplicationRunner {
                 Schedule.builder().date(LocalDate.parse("2024-03-23")).is3d(false).isLongMovie(false).startTime(LocalTime.parse("14:00:00")).movie(movies.get(0)).hall(halls.get(0)).build()
         );
         schedules.forEach(schedule -> {
-            ScheduleDto scheduleDto = scheduleService.create(scheduleService.toDto(schedule));
+            ScheduleDTO scheduleDto = scheduleService.create(scheduleService.toDto(schedule));
             schedule.setId(scheduleDto.getId());
         });
     }
