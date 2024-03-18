@@ -1,24 +1,31 @@
 package dk.kino.service.hall;
 
 import dk.kino.dto.HallDTO;
+import dk.kino.dto.SeatDTO;
 import dk.kino.entity.Hall;
+import dk.kino.entity.Seat;
 import dk.kino.repository.CinemaRepository;
 import dk.kino.repository.HallRepository;
+import dk.kino.service.SeatService;
 import org.springframework.stereotype.Service;
 
+import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 @Service
 public class HallServiceImpl implements HallService {
 
-    private HallRepository hallRepository;
-    private CinemaRepository cinemaRepository;
+    private final HallRepository hallRepository;
+    private final CinemaRepository cinemaRepository;
+    private final SeatService seatService;
 
-    public HallServiceImpl(HallRepository hallRepository, CinemaRepository cinemaRepository) {
+    public HallServiceImpl(HallRepository hallRepository, CinemaRepository cinemaRepository,SeatService seatService) {
         this.hallRepository = hallRepository;
         this.cinemaRepository = cinemaRepository;
+        this.seatService = seatService;
     }
 
     @Override
@@ -44,6 +51,10 @@ public class HallServiceImpl implements HallService {
         Hall hall = convertToEntity(hallDTO);
         cinemaRepository.findById(hallDTO.getCinemaId()).ifPresent(hall::setCinema);
         Hall savedHall = hallRepository.save(hall);
+        // CREATE SEATS
+        Set<Seat> seats = createSeats(savedHall);
+        Set<SeatDTO> seatDTOs = seats.stream().map(seatService::toDto).collect(Collectors.toSet());
+        seatService.createSeats(seatDTOs);
         return convertHallToDTO(savedHall);
     }
 
@@ -68,6 +79,31 @@ public class HallServiceImpl implements HallService {
     @Override
     public void deleteHall(int id) {
         hallRepository.deleteById(id);
+    }
+
+    private Set<Seat> createSeats(Hall hall) {
+        int noOfCols = hall.getNoOfColumns();
+        int noOfRows = hall.getNoOfRows();
+        Set<Seat> seats = new HashSet<>();
+        int seatIndex = 0;
+        for (int row = 1; row <= noOfRows; row++) {
+            double seatPrice = 80;
+            if (row > 2) {
+                seatPrice = 100;
+            }
+            if (row ==  noOfRows) {
+                seatPrice = 120;
+            }
+            for (int col = 1; col <= noOfCols; col++) {
+                seats.add(Seat.builder()
+                        .seatIndex(seatIndex)
+                        .currentPrice(seatPrice)
+                        .hall(hall)
+                        .build());
+                ++seatIndex;
+            }
+        }
+        return seats;
     }
 
     @Override
