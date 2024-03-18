@@ -39,7 +39,9 @@ public class SeatServiceImpl implements SeatService {
         seats.forEach(seat -> seat.setActive(false));
         seatRepository.saveAll(seats);
     }
-    private SeatDTO toDto(Seat entity) {
+
+    @Override
+    public SeatDTO toDto(Seat entity) {
         return SeatDTO.builder()
                 .id(entity.getId())
                 .seatIndex(entity.getSeatIndex())
@@ -48,7 +50,8 @@ public class SeatServiceImpl implements SeatService {
                 .build();
     }
 
-    private Seat toEntity(SeatDTO dto) {
+    @Override
+    public Seat toEntity(SeatDTO dto) {
         Hall hall = new Hall();
         hall.setId(dto.getHallId());
         return Seat.builder()
