@@ -101,7 +101,8 @@ public class ScheduleServiceImpl implements ScheduleService {
         scheduleRepository.delete(schedule);
     }
 
-    private ScheduleDto toDto(Schedule schedule) {
+    @Override
+    public ScheduleDto toDto(Schedule schedule) {
         return ScheduleDto.builder()
                 .id(schedule.getId())
                 .date(schedule.getDate())
@@ -115,7 +116,8 @@ public class ScheduleServiceImpl implements ScheduleService {
                 .build();
     }
 
-    private Schedule toEntity(ScheduleDto scheduleDto) {
+    @Override
+    public Schedule toEntity(ScheduleDto scheduleDto) {
         Hall hall = hallService.convertToEntity(hallService.findByNameAndCinemaName(scheduleDto.getHallName(),scheduleDto.getCinemaName()));
         Movie movie = movieService.toEntity(movieService.findByTitle(scheduleDto.getMovieTitle()).orElse(null));
         Schedule schedule = Schedule.builder()

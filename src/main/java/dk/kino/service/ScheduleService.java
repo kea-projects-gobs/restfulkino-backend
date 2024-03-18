@@ -13,4 +13,6 @@ public interface ScheduleService {
     ScheduleDto create(ScheduleDto scheduleDto);
     ScheduleDto update(int id, ScheduleDto scheduleDto);
     void delete(int id);
+    ScheduleDto toDto(Schedule schedule);
+    Schedule toEntity(ScheduleDto scheduleDto);
 }

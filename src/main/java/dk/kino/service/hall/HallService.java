@@ -13,7 +13,7 @@ public interface HallService {
     HallDTO createHall(HallDTO hallDTO);
     HallDTO updateHall(int id, HallDTO hallDTO);
     void deleteHall(int id);
-    Object convertHallToDTO(Hall hall);
+    HallDTO convertHallToDTO(Hall hall);
     Hall convertToEntity(HallDTO hallDTO);
     List<HallDTO> findHallsByCinemaId(int cinemaId);
 }

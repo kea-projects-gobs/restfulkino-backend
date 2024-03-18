@@ -13,7 +13,7 @@ public interface CinemaService {
     CinemaDTO updateCinema(int id, CinemaDTO cinemaDTO);
     void deleteCinema(int id);
 
-    Object convertToDTO(Cinema cinema);
+    CinemaDTO convertToDTO(Cinema cinema);
 
     Cinema convertToEntity(CinemaDTO cinemaDTO);
 
