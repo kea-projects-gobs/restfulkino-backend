@@ -4,10 +4,12 @@ import dk.kino.dto.HallDTO;
 import dk.kino.dto.SeatDTO;
 import dk.kino.entity.Hall;
 import dk.kino.entity.Seat;
+import dk.kino.exception.BadRequestException;
 import dk.kino.repository.CinemaRepository;
 import dk.kino.repository.HallRepository;
 import dk.kino.service.SeatService;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.HashSet;
 import java.util.List;
@@ -59,15 +61,29 @@ public class HallServiceImpl implements HallService {
     }
 
     @Override
+    @Transactional
     public HallDTO updateHall(int id, HallDTO hallDTO) {
         Optional<Hall> existingHall = hallRepository.findById(id);
         if (existingHall.isPresent()){
             Hall hall = existingHall.get();
+
+            // Check if hall gets resized
+            boolean resizeCol = hall.getNoOfColumns() != hallDTO.getNoOfColumns();
+            boolean resizeRow = hall.getNoOfRows() != hallDTO.getNoOfRows();
+            if(hall.getNoOfRows()<1 || hall.getNoOfColumns()<1) throw new BadRequestException("rows and columns must be above 1");
+            if (resizeCol || resizeRow) {
+                hall.setNoOfColumns(hallDTO.getNoOfColumns());
+                hall.setNoOfRows(hallDTO.getNoOfRows());
+                // Delete old seats
+                Set<SeatDTO> oldSeats = hall.getSeats().stream().map(seatService::toDto).collect(Collectors.toSet());
+                seatService.deleteSeats(oldSeats);
+                // Create new seats
+                seatService.createSeats(createSeats(hall).stream().map(seatService::toDto).collect(Collectors.toSet()));
+            }
             // Update the entity's fields:
             hall.setName(hallDTO.getName());
-            hall.setNoOfRows(hallDTO.getNoOfRows());
-            hall.setNoOfColumns(hallDTO.getNoOfColumns());
             hall.setImageUrl(hallDTO.getImageUrl());
+
             cinemaRepository.findById(hallDTO.getCinemaId()).ifPresent(hall::setCinema);
             hall = hallRepository.save(hall);
             return convertHallToDTO(hall);
