@@ -67,6 +67,31 @@ public class SecurityConfig {
             .requestMatchers(mvcMatcherBuilder.pattern(HttpMethod.GET, "/swagger-resources/**")).permitAll()
             .requestMatchers(mvcMatcherBuilder.pattern(HttpMethod.GET, "/v3/api-docs/**")).permitAll()
 
+            // Allow for ADMIN to POST, PUT, and DELETE Cinemas, and ALL to GET
+            .requestMatchers(mvcMatcherBuilder.pattern(HttpMethod.GET, "/api/cinemas")).permitAll()
+            .requestMatchers(mvcMatcherBuilder.pattern(HttpMethod.POST, "/api/cinemas")).hasAuthority("ADMIN")
+            .requestMatchers(mvcMatcherBuilder.pattern(HttpMethod.PUT, "/api/cinemas/*")).hasAuthority("ADMIN")
+            .requestMatchers(mvcMatcherBuilder.pattern(HttpMethod.DELETE, "/api/cinemas/*")).hasAuthority("ADMIN")
+
+            // Allow for ADMIN to POST, PUT, and DELETE Halls, and ALL to GET
+            .requestMatchers(mvcMatcherBuilder.pattern(HttpMethod.GET, "/api/halls")).permitAll()
+            .requestMatchers(mvcMatcherBuilder.pattern(HttpMethod.POST, "/api/halls")).hasAuthority("ADMIN")
+            .requestMatchers(mvcMatcherBuilder.pattern(HttpMethod.PUT, "/api/halls/*")).hasAuthority("ADMIN")
+            .requestMatchers(mvcMatcherBuilder.pattern(HttpMethod.DELETE, "/api/halls/*")).hasAuthority("ADMIN")
+
+            // Allow for ADMIN to POST, PUT, and DELETE Movies, and ALL to GET
+            .requestMatchers(mvcMatcherBuilder.pattern(HttpMethod.GET, "/api/movies")).permitAll()
+            .requestMatchers(mvcMatcherBuilder.pattern(HttpMethod.POST, "/api/movies")).hasAuthority("ADMIN")
+            .requestMatchers(mvcMatcherBuilder.pattern(HttpMethod.PUT, "/api/movies/*")).hasAuthority("ADMIN")
+            .requestMatchers(mvcMatcherBuilder.pattern(HttpMethod.DELETE, "/api/movies/*")).hasAuthority("ADMIN")
+
+            // Allow for ADMIN to POST, PUT, and DELETE Schedules, and ALL to GET
+            .requestMatchers(mvcMatcherBuilder.pattern(HttpMethod.GET, "/api/schedules")).permitAll()
+            .requestMatchers(mvcMatcherBuilder.pattern(HttpMethod.POST, "/api/schedules")).hasAuthority("ADMIN")
+            .requestMatchers(mvcMatcherBuilder.pattern(HttpMethod.PUT, "/api/schedules/*")).hasAuthority("ADMIN")
+            .requestMatchers(mvcMatcherBuilder.pattern(HttpMethod.DELETE, "/api/schedules/*")).hasAuthority("ADMIN")
+
+
             //Required for error responses
             .requestMatchers(mvcMatcherBuilder.pattern("/error")).permitAll()
 
