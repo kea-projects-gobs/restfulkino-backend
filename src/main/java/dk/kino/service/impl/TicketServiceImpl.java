@@ -1,6 +1,7 @@
 package dk.kino.service.impl;
 
 import dk.kino.dto.TicketDTO;
+import dk.kino.entity.Reservation;
 import dk.kino.entity.Seat;
 import dk.kino.entity.Ticket;
 import dk.kino.repository.TicketRepository;
@@ -41,6 +42,7 @@ public class TicketServiceImpl implements TicketService {
                 .price(ticketDTO.getPrice())
                 .seat(Seat.builder().id(ticketDTO.getSeatId()).build())
                 .price(ticketDTO.getPrice())
+                .reservation(Reservation.builder().id(ticketDTO.getReservationId()).build())
                 .build();
     }
 
@@ -50,6 +52,7 @@ public class TicketServiceImpl implements TicketService {
                 .id(ticket.getId())
                 .seatId(ticket.getSeat().getId())
                 .price(ticket.getPrice())
+                .reservationId(ticket.getReservation().getId())
                 .build();
     }
 }
