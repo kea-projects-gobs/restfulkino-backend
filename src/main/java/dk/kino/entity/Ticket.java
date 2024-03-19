@@ -17,4 +17,6 @@ public class Ticket {
     @JoinColumn(name = "seat_id")
     private Seat seat;
     private double price;
+    @ManyToOne
+    private Reservation reservation;
 }

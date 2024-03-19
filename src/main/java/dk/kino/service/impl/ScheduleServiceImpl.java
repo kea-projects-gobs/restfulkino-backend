@@ -14,6 +14,7 @@ import org.springframework.stereotype.Service;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -32,6 +33,11 @@ public class ScheduleServiceImpl implements ScheduleService {
     @Override
     public List<ScheduleDTO> findAll() {
         return scheduleRepository.findAll().stream().map(this::toDto).collect(Collectors.toList());
+    }
+
+    @Override
+    public Optional<ScheduleDTO> findById(int id) {
+        return scheduleRepository.findById(id).map(this::toDto);
     }
 
     @Override
@@ -110,16 +116,15 @@ public class ScheduleServiceImpl implements ScheduleService {
                 .endTime(schedule.getEndTime())
                 .is3d(schedule.is3d())
                 .isLongMovie(schedule.isLongMovie())
-                .hallName(schedule.getHall().getName())
-                .movieTitle(schedule.getMovie().getTitle())
-                .cinemaName(schedule.getHall().getCinema().getName())
+                .hallId(schedule.getHall().getId())
+                .movieId(schedule.getMovie().getId())
                 .build();
     }
 
     @Override
     public Schedule toEntity(ScheduleDTO scheduleDTO) {
-        Hall hall = hallService.convertToEntity(hallService.findByNameAndCinemaName(scheduleDTO.getHallName(), scheduleDTO.getCinemaName()));
-        Movie movie = movieService.toEntity(movieService.findByTitle(scheduleDTO.getMovieTitle()).orElse(null));
+        Hall hall = hallService.convertToEntity(hallService.findById(scheduleDTO.getHallId()));
+        Movie movie = movieService.toEntity(movieService.findById(scheduleDTO.getMovieId()).orElse(null));
         Schedule schedule = Schedule.builder()
                 .id(scheduleDTO.getId())
                 .date(scheduleDTO.getDate())
