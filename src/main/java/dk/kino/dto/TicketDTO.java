@@ -5,11 +5,13 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 
+import java.util.Objects;
+
 @Getter
 @AllArgsConstructor
 @Builder
 public class TicketDTO {
     private int id;
-    private int seatIndex;
+    private int seatId;
     private double price;
 }
