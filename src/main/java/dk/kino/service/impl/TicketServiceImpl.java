@@ -14,7 +14,6 @@ import java.util.Optional;
 public class TicketServiceImpl implements TicketService {
 
     private final TicketRepository ticketRepository;
-
     public TicketServiceImpl(TicketRepository ticketRepository) {
         this.ticketRepository = ticketRepository;
     }
@@ -40,7 +39,7 @@ public class TicketServiceImpl implements TicketService {
     public Ticket toEntity(TicketDTO ticketDTO) {
         return Ticket.builder()
                 .price(ticketDTO.getPrice())
-                .seat(Seat.builder().id(ticketDTO.getId()).build())
+                .seat(Seat.builder().id(ticketDTO.getSeatId()).build())
                 .price(ticketDTO.getPrice())
                 .build();
     }
