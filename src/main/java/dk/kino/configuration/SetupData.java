@@ -97,14 +97,14 @@ public class SetupData implements ApplicationRunner {
             schedule.setId(scheduleDTO.getId());
         });
 
-        // Create Tickets
-        List<Ticket> tickets = Arrays.asList(
-                Ticket.builder().price(80.0).seat(Seat.builder().id(1).build()).build(),
-                Ticket.builder().price(80.0).seat(Seat.builder().id(2).build()).build(),
-                Ticket.builder().price(80.0).seat(Seat.builder().id(3).build()).build(),
-                Ticket.builder().price(80.0).seat(Seat.builder().id(4).build()).build()
-        );
-        ticketService.createTickets(tickets.stream().map(ticketService::toDto).toList());
+//        // Create Tickets
+//        List<Ticket> tickets = Arrays.asList(
+//                Ticket.builder().price(80.0).seat(Seat.builder().id(1).build()).build(),
+//                Ticket.builder().price(80.0).seat(Seat.builder().id(2).build()).build(),
+//                Ticket.builder().price(80.0).seat(Seat.builder().id(3).build()).build(),
+//                Ticket.builder().price(80.0).seat(Seat.builder().id(4).build()).build()
+//        );
+//        ticketService.createTickets(tickets.stream().map(ticketService::toDto).toList());
 
     }
 }
