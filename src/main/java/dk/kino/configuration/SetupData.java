@@ -1,18 +1,14 @@
 package dk.kino.configuration;
 
-import dk.kino.dto.CinemaDTO;
-import dk.kino.dto.HallDTO;
-import dk.kino.dto.MovieDTO;
-import dk.kino.dto.ScheduleDTO;
+import dk.kino.dto.*;
 import dk.kino.entity.*;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
+import java.util.*;
 
 import dk.kino.service.MovieService;
+import dk.kino.service.ReservationService;
 import dk.kino.service.ScheduleService;
 import dk.kino.service.TicketService;
 import dk.kino.service.cinema.CinemaService;
@@ -28,13 +24,13 @@ public class SetupData implements ApplicationRunner {
     private final CinemaService cinemaService;
     private final MovieService movieService;
     private final ScheduleService scheduleService;
-    private final TicketService ticketService;
-    public SetupData(HallService hallService, CinemaService cinemaService, MovieService movieService,ScheduleService scheduleService,TicketService ticketService) {
+    private final ReservationService reservationService;
+    public SetupData(HallService hallService, CinemaService cinemaService, MovieService movieService,ScheduleService scheduleService,ReservationService reservationService) {
         this.hallService = hallService;
         this.cinemaService = cinemaService;
         this.movieService = movieService;
         this.scheduleService = scheduleService;
-        this.ticketService = ticketService;
+        this.reservationService = reservationService;
     }
 
     @Override
@@ -101,14 +97,22 @@ public class SetupData implements ApplicationRunner {
             schedule.setId(scheduleDTO.getId());
         });
 
-//        // Create Tickets
-//        List<Ticket> tickets = Arrays.asList(
-//                Ticket.builder().price(80.0).seat(Seat.builder().id(1).build()).build(),
-//                Ticket.builder().price(80.0).seat(Seat.builder().id(2).build()).build(),
-//                Ticket.builder().price(80.0).seat(Seat.builder().id(3).build()).build(),
-//                Ticket.builder().price(80.0).seat(Seat.builder().id(4).build()).build()
-//        );
-//        ticketService.createTickets(tickets.stream().map(ticketService::toDto).toList());
 
+        // Reservations
+        Set<Integer> seatIds1 = new HashSet<>();
+        Set<Integer> seatIds2 = new HashSet<>();
+        Set<Integer> seatIds3 = new HashSet<>();
+        for (int i=1; i<=10; i++) {
+            if (i<=3) seatIds1.add(i);
+            if (i>3 && i<=6) seatIds2.add(i);
+            if (i>6) seatIds3.add(i);
+        }
+
+        List<ReservationReqDTO> reservations = Arrays.asList(
+                ReservationReqDTO.builder().seatIds(seatIds1).scheduleId(schedules.get(0).getId()).build(),
+                ReservationReqDTO.builder().seatIds(seatIds2).scheduleId(schedules.get(0).getId()).build(),
+                ReservationReqDTO.builder().seatIds(seatIds3).scheduleId(schedules.get(0).getId()).build()
+        );
+        reservations.forEach(reservationService::createReservation);
     }
 }
