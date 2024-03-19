@@ -57,4 +57,23 @@ public class TicketServiceTest {
         // Assert
         Assertions.assertTrue(result.isEmpty());
     }
+
+    @Test
+    public void testCreateTicket_ValidTicketDTO_CreatesAndReturnsTicketDTO() {
+        // Arrange
+        TicketDTO ticketDTO = TicketDTO.builder().price(10.0).seatId(1).build();
+        Ticket savedTicket = Ticket.builder().id(1).price(10.0).seat(Seat.builder().id(1).build()).build();
+        TicketDTO expectedTicketDTO = TicketDTO.builder().id(1).price(10.0).seatId(1).build();
+
+        when(ticketRepository.save(any(Ticket.class))).thenReturn(savedTicket);
+
+        // Act
+        TicketDTO result = ticketService.createTicket(ticketDTO);
+
+        // Assert
+        Assertions.assertEquals(expectedTicketDTO.getId(), result.getId());
+        Assertions.assertEquals(expectedTicketDTO.getPrice(), result.getPrice());
+        Assertions.assertEquals(expectedTicketDTO.getSeatId(), result.getSeatId());
+    }
+    
 }
