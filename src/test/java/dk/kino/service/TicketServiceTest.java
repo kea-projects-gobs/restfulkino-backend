@@ -75,5 +75,33 @@ public class TicketServiceTest {
         Assertions.assertEquals(expectedTicketDTO.getPrice(), result.getPrice());
         Assertions.assertEquals(expectedTicketDTO.getSeatId(), result.getSeatId());
     }
-    
+
+    @Test
+    public void testCreateTickets_ValidTicketDTOs_CreatesAndReturnsTicketDTOs() {
+        // Arrange
+        List<TicketDTO> ticketDTOs = new ArrayList<>();
+        ticketDTOs.add(TicketDTO.builder().price(10.0).seatId(1).build());
+        ticketDTOs.add(TicketDTO.builder().price(12.0).seatId(2).build());
+
+        List<Ticket> savedTickets = new ArrayList<>();
+        savedTickets.add(Ticket.builder().id(1).price(10.0).seat(Seat.builder().id(1).build()).build());
+        savedTickets.add(Ticket.builder().id(2).price(12.0).seat(Seat.builder().id(2).build()).build());
+
+        List<TicketDTO> expectedTicketDTOs = new ArrayList<>();
+        expectedTicketDTOs.add(TicketDTO.builder().id(1).price(10.0).seatId(1).build());
+        expectedTicketDTOs.add(TicketDTO.builder().id(2).price(12.0).seatId(2).build());
+
+        when(ticketRepository.saveAll(anyList())).thenReturn(savedTickets);
+
+        // Act
+        List<TicketDTO> result = ticketService.createTickets(ticketDTOs);
+
+        // Assert
+        Assertions.assertEquals(expectedTicketDTOs.get(0).getId(), result.get(0).getId());
+        Assertions.assertEquals(expectedTicketDTOs.get(0).getPrice(), result.get(0).getPrice());
+        Assertions.assertEquals(expectedTicketDTOs.get(0).getSeatId(), result.get(0).getSeatId());
+        Assertions.assertEquals(expectedTicketDTOs.get(1).getId(), result.get(1).getId());
+        Assertions.assertEquals(expectedTicketDTOs.get(1).getPrice(), result.get(1).getPrice());
+        Assertions.assertEquals(expectedTicketDTOs.get(1).getSeatId(), result.get(1).getSeatId());
+    }
 }
