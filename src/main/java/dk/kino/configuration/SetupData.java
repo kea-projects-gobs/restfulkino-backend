@@ -1,6 +1,7 @@
 package dk.kino.configuration;
 
 import dk.kino.dto.CinemaDTO;
+import dk.kino.dto.HallDTO;
 import dk.kino.dto.MovieDTO;
 import dk.kino.dto.ScheduleDTO;
 import dk.kino.entity.*;
@@ -59,7 +60,10 @@ public class SetupData implements ApplicationRunner {
             halls.add(new Hall("Hall 1", 10, 10, "random.com", cinema));
             halls.add(new Hall("Hall 2", 10, 10, "random.com", cinema));
         });
-        halls.forEach(hall -> hallService.createHall(hallService.convertHallToDTO(hall)));
+        halls.forEach(hall -> {
+            HallDTO hallDTO = hallService.createHall(hallService.convertHallToDTO(hall));
+            hall.setId(hallDTO.getId());
+        });
 
 
         // Create Movies
