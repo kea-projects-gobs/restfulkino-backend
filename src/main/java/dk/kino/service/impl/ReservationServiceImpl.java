@@ -38,14 +38,13 @@ public class ReservationServiceImpl implements ReservationService {
     @Override
     @Transactional
     public ReservationResDTO createReservation(ReservationReqDTO reservationReqDTO) {
+        // USE PRICE SERVICE
         double PRICE_LONG_MOVIE = 20.0;
         double PRICE_3D = 10.0;
-
         double FEE = 0.07;
         double DISCOUNT = 0.05;
 
         double TICKET_PRICE_ADJUSTMENT = 0;
-
 
         Reservation reservation = toEntity(reservationReqDTO);
         ScheduleDTO scheduleDTO = scheduleService.findById(reservation.getSchedule().getId()).orElseThrow(() -> new NotFoundException("Schedule not found"));
@@ -66,7 +65,7 @@ public class ReservationServiceImpl implements ReservationService {
             SeatDTO seatDTO = seatService.findSeatById(seatId).orElseThrow(() -> new NotFoundException("Seat not found"));
 
             // Check if seat belongs to hall
-//            if(seatDTO.getHallId() != scheduleDTO.getHallId()) throw new BadRequestException("Seat does not belong to Hall");
+            if(seatDTO.getHallId() != scheduleDTO.getHallId()) throw new BadRequestException("Seat does not belong to Hall");
             
             ticket.setSeat(seatService.toEntity(seatDTO));
             // SET PRICE
