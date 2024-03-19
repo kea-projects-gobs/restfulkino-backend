@@ -90,8 +90,13 @@ public class AuthenticationController {
 
   @PostMapping("/logout")
   @Operation(summary = "Logout", description = "Used to invalidate token on logout")
-  public ResponseEntity<?> logout(@RequestHeader("Authorization") String token) {
-      tokenStore.invalidateToken(token.replace("Bearer ", ""));
+  public ResponseEntity<?> logout(@RequestHeader("Authorization") String authHeader) {
+      if (authHeader != null && authHeader.startsWith("Bearer ")) {
+          String token = authHeader.substring(7);
+          // Attempt to invalidate the token if it exists, but don't error if the token is invalid or expired
+          tokenStore.invalidateToken(token);
+      }
+      // Always return a successful response to ensure the client can "log out"
       return ResponseEntity.ok().build();
-    }
+  }
 }
