@@ -24,7 +24,7 @@ public class HallController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<HallDTO> getHallById(int id) {
+    public ResponseEntity<HallDTO> getHallById(@PathVariable int id) {
         HallDTO hall = hallService.findById(id);
         return ResponseEntity.ok(hall);
     }
