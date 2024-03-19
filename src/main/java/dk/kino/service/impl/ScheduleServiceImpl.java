@@ -14,6 +14,7 @@ import org.springframework.stereotype.Service;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -32,6 +33,11 @@ public class ScheduleServiceImpl implements ScheduleService {
     @Override
     public List<ScheduleDTO> findAll() {
         return scheduleRepository.findAll().stream().map(this::toDto).collect(Collectors.toList());
+    }
+
+    @Override
+    public Optional<ScheduleDTO> findById(int id) {
+        return scheduleRepository.findById(id).map(this::toDto);
     }
 
     @Override
