@@ -30,11 +30,13 @@ public class SetupDevUsers implements ApplicationRunner {
     public void run(ApplicationArguments args) {
         setupAllowedRoles();
         setupUserWithRoleUsers();
+        setupEmployee();
     }
 
     private void setupAllowedRoles(){
         roleRepository.save(new Role("USER"));
         roleRepository.save(new Role("ADMIN"));
+        roleRepository.save(new Role("EMPLOYEE"));
     }
 
      /*****************************************************************************************
@@ -66,5 +68,15 @@ public class SetupDevUsers implements ApplicationRunner {
         userWithRolesRepository.save(user2);
         userWithRolesRepository.save(user3);
         userWithRolesRepository.save(user4);
+    }
+
+    private void setupEmployee(){
+        Role roleEmployee = roleRepository.findById("EMPLOYEE").orElseThrow(()-> new NoSuchElementException("Role 'employee' not found"));
+        UserWithRoles employee1 = new UserWithRoles("employee1", pwEncoder.encode(passwordUsedByAll), "employee1@a.dk");
+        UserWithRoles employee2 = new UserWithRoles("employee2", pwEncoder.encode(passwordUsedByAll), "employee2@a.dk");
+        employee1.addRole(roleEmployee);
+        employee2.addRole(roleEmployee);
+        userWithRolesRepository.save(employee1);
+        userWithRolesRepository.save(employee2);
     }
 }
