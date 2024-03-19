@@ -37,13 +37,13 @@ public class ScheduleController {
     }
 
     @PostMapping
-    public ResponseEntity<ScheduleDTO> createSchedule(@RequestBody ScheduleDTO scheduleDto) {
-        return ResponseEntity.status(HttpStatus.CREATED).body(scheduleService.create(scheduleDto));
+    public ResponseEntity<ScheduleDTO> createSchedule(@RequestBody ScheduleDTO scheduleDTO) {
+        return ResponseEntity.status(HttpStatus.CREATED).body(scheduleService.create(scheduleDTO));
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<ScheduleDTO> updateSchedule(@PathVariable int id, @RequestBody ScheduleDTO scheduleDto) {
-        return ResponseEntity.ok().body(scheduleService.update(id,scheduleDto));
+    public ResponseEntity<ScheduleDTO> updateSchedule(@PathVariable int id, @RequestBody ScheduleDTO scheduleDTO) {
+        return ResponseEntity.ok().body(scheduleService.update(id, scheduleDTO));
     }
 
     @DeleteMapping("/{id}")

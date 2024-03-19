@@ -10,9 +10,9 @@ public interface ScheduleService {
     List<ScheduleDTO> findAll();
     List<ScheduleDTO> findByDate(LocalDate date);
     List<ScheduleDTO> findByDateAndMovieIdAndCinemaId(LocalDate date, int movieId, int cinemaId);
-    ScheduleDTO create(ScheduleDTO scheduleDto);
-    ScheduleDTO update(int id, ScheduleDTO scheduleDto);
+    ScheduleDTO create(ScheduleDTO scheduleDTO);
+    ScheduleDTO update(int id, ScheduleDTO scheduleDTO);
     void delete(int id);
     ScheduleDTO toDto(Schedule schedule);
-    Schedule toEntity(ScheduleDTO scheduleDto);
+    Schedule toEntity(ScheduleDTO scheduleDTO);
 }

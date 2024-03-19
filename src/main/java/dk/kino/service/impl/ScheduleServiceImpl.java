@@ -45,8 +45,8 @@ public class ScheduleServiceImpl implements ScheduleService {
     }
 
     @Override
-    public ScheduleDTO create(ScheduleDTO scheduleDto) {
-        Schedule schedule = toEntity(scheduleDto);
+    public ScheduleDTO create(ScheduleDTO scheduleDTO) {
+        Schedule schedule = toEntity(scheduleDTO);
         validateScheduleUniqueness(schedule);
         schedule.setLongMovie(isLongMovie(schedule));
         schedule.setEndTime(getEndTime(schedule));
@@ -54,12 +54,12 @@ public class ScheduleServiceImpl implements ScheduleService {
     }
 
     @Override
-    public ScheduleDTO update(int id, ScheduleDTO scheduleDto) {
+    public ScheduleDTO update(int id, ScheduleDTO scheduleDTO) {
         // Find schedule
         Schedule originalSchedule = scheduleRepository.findById(id).orElseThrow(() -> new RuntimeException(("Unable to find schedule with id=" + id)));
 
         // Map to entity
-        Schedule schedule = toEntity(scheduleDto);
+        Schedule schedule = toEntity(scheduleDTO);
         validateScheduleUniqueness(schedule);
 
         // Update original schedule
@@ -117,16 +117,16 @@ public class ScheduleServiceImpl implements ScheduleService {
     }
 
     @Override
-    public Schedule toEntity(ScheduleDTO scheduleDto) {
-        Hall hall = hallService.convertToEntity(hallService.findByNameAndCinemaName(scheduleDto.getHallName(),scheduleDto.getCinemaName()));
-        Movie movie = movieService.toEntity(movieService.findByTitle(scheduleDto.getMovieTitle()).orElse(null));
+    public Schedule toEntity(ScheduleDTO scheduleDTO) {
+        Hall hall = hallService.convertToEntity(hallService.findByNameAndCinemaName(scheduleDTO.getHallName(), scheduleDTO.getCinemaName()));
+        Movie movie = movieService.toEntity(movieService.findByTitle(scheduleDTO.getMovieTitle()).orElse(null));
         Schedule schedule = Schedule.builder()
-                .id(scheduleDto.getId())
-                .date(scheduleDto.getDate())
-                .startTime(scheduleDto.getStartTime())
+                .id(scheduleDTO.getId())
+                .date(scheduleDTO.getDate())
+                .startTime(scheduleDTO.getStartTime())
 //                .endTime(scheduleDto.getStartTime().plusMinutes(movie.getDuration()))
-                .is3d(scheduleDto.is3d())
-                .isLongMovie(scheduleDto.isLongMovie())
+                .is3d(scheduleDTO.is3d())
+                .isLongMovie(scheduleDTO.isLongMovie())
                 .movie(movie)
                 .hall(hall)
                 .build();
