@@ -7,6 +7,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.util.List;
+import java.util.Set;
 
 @Entity
 @Getter
@@ -30,6 +31,8 @@ public class Hall {
 
     @OneToMany(mappedBy = "hall")
     private List<Schedule> schedules;
+    @OneToMany(mappedBy = "hall")
+    private Set<Seat> seats;
 
     public Hall(String name, int noOfRows, int noOfColumns, String imageUrl, Cinema cinema) {
         this.name = name;

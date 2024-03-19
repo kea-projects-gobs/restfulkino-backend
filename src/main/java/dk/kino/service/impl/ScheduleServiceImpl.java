@@ -1,7 +1,7 @@
 package dk.kino.service.impl;
 
 import dk.kino.dto.MovieDTO;
-import dk.kino.dto.ScheduleDto;
+import dk.kino.dto.ScheduleDTO;
 import dk.kino.entity.Hall;
 import dk.kino.entity.Movie;
 import dk.kino.entity.Schedule;
@@ -30,23 +30,23 @@ public class ScheduleServiceImpl implements ScheduleService {
     }
 
     @Override
-    public List<ScheduleDto> findAll() {
+    public List<ScheduleDTO> findAll() {
         return scheduleRepository.findAll().stream().map(this::toDto).collect(Collectors.toList());
     }
 
     @Override
-    public List<ScheduleDto> findByDate(LocalDate date) {
+    public List<ScheduleDTO> findByDate(LocalDate date) {
             return scheduleRepository.findByDate(date).stream().map(this::toDto).collect(Collectors.toList());
     }
 
     @Override
-    public List<ScheduleDto> findByDateAndMovieIdAndCinemaId(LocalDate date, int movieId, int cinemaId) {
+    public List<ScheduleDTO> findByDateAndMovieIdAndCinemaId(LocalDate date, int movieId, int cinemaId) {
         return scheduleRepository.findByDateAndMovieIdAndCinemaId(date,cinemaId,movieId).stream().map(this::toDto).collect(Collectors.toList());
     }
 
     @Override
-    public ScheduleDto create(ScheduleDto scheduleDto) {
-        Schedule schedule = toEntity(scheduleDto);
+    public ScheduleDTO create(ScheduleDTO scheduleDTO) {
+        Schedule schedule = toEntity(scheduleDTO);
         validateScheduleUniqueness(schedule);
         schedule.setLongMovie(isLongMovie(schedule));
         schedule.setEndTime(getEndTime(schedule));
@@ -54,12 +54,12 @@ public class ScheduleServiceImpl implements ScheduleService {
     }
 
     @Override
-    public ScheduleDto update(int id,ScheduleDto scheduleDto) {
+    public ScheduleDTO update(int id, ScheduleDTO scheduleDTO) {
         // Find schedule
         Schedule originalSchedule = scheduleRepository.findById(id).orElseThrow(() -> new RuntimeException(("Unable to find schedule with id=" + id)));
 
         // Map to entity
-        Schedule schedule = toEntity(scheduleDto);
+        Schedule schedule = toEntity(scheduleDTO);
         validateScheduleUniqueness(schedule);
 
         // Update original schedule
@@ -101,8 +101,9 @@ public class ScheduleServiceImpl implements ScheduleService {
         scheduleRepository.delete(schedule);
     }
 
-    private ScheduleDto toDto(Schedule schedule) {
-        return ScheduleDto.builder()
+    @Override
+    public ScheduleDTO toDto(Schedule schedule) {
+        return ScheduleDTO.builder()
                 .id(schedule.getId())
                 .date(schedule.getDate())
                 .startTime(schedule.getStartTime())
@@ -115,16 +116,17 @@ public class ScheduleServiceImpl implements ScheduleService {
                 .build();
     }
 
-    private Schedule toEntity(ScheduleDto scheduleDto) {
-        Hall hall = hallService.convertToEntity(hallService.findByNameAndCinemaName(scheduleDto.getHallName(),scheduleDto.getCinemaName()));
-        Movie movie = movieService.toEntity(movieService.findByTitle(scheduleDto.getMovieTitle()).orElse(null));
+    @Override
+    public Schedule toEntity(ScheduleDTO scheduleDTO) {
+        Hall hall = hallService.convertToEntity(hallService.findByNameAndCinemaName(scheduleDTO.getHallName(), scheduleDTO.getCinemaName()));
+        Movie movie = movieService.toEntity(movieService.findByTitle(scheduleDTO.getMovieTitle()).orElse(null));
         Schedule schedule = Schedule.builder()
-                .id(scheduleDto.getId())
-                .date(scheduleDto.getDate())
-                .startTime(scheduleDto.getStartTime())
+                .id(scheduleDTO.getId())
+                .date(scheduleDTO.getDate())
+                .startTime(scheduleDTO.getStartTime())
 //                .endTime(scheduleDto.getStartTime().plusMinutes(movie.getDuration()))
-                .is3d(scheduleDto.is3d())
-                .isLongMovie(scheduleDto.isLongMovie())
+                .is3d(scheduleDTO.is3d())
+                .isLongMovie(scheduleDTO.isLongMovie())
                 .movie(movie)
                 .hall(hall)
                 .build();

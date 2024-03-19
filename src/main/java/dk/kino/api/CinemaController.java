@@ -24,8 +24,8 @@ public class CinemaController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<CinemaDTO> findCinemaById(@PathVariable int movieId) {
-        CinemaDTO cinema = cinemaService.findById(movieId);
+    public ResponseEntity<CinemaDTO> findCinemaById(@PathVariable int id) {
+        CinemaDTO cinema = cinemaService.findById(id);
         return ResponseEntity.ok(cinema);
     }
 

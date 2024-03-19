@@ -14,4 +14,5 @@ public interface MovieService {
     MovieDTO update(int id, MovieDTO movieDTO);
     void delete(int id);
     Movie toEntity(MovieDTO movieDTO);
+    MovieDTO toDto(Movie movie);
 }

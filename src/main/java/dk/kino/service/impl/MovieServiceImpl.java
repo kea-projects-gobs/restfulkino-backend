@@ -67,6 +67,7 @@ public class MovieServiceImpl implements MovieService {
         movieRepository.delete(movie);
     }
 
+    @Override
     public MovieDTO toDto(Movie movie) {
         return MovieDTO.builder()
                 .id(movie.getId())
@@ -82,6 +83,7 @@ public class MovieServiceImpl implements MovieService {
                 .build();
     }
 
+    @Override
     public Movie toEntity(MovieDTO movieDTO) {
         return Movie.builder()
                 .id(movieDTO.getId())
