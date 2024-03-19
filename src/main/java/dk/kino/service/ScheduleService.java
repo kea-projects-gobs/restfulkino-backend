@@ -1,18 +1,18 @@
 package dk.kino.service;
 
-import dk.kino.dto.ScheduleDto;
+import dk.kino.dto.ScheduleDTO;
 import dk.kino.entity.Schedule;
 
 import java.time.LocalDate;
 import java.util.List;
 
 public interface ScheduleService {
-    List<ScheduleDto> findAll();
-    List<ScheduleDto> findByDate(LocalDate date);
-    List<ScheduleDto> findByDateAndMovieIdAndCinemaId(LocalDate date, int movieId,int cinemaId);
-    ScheduleDto create(ScheduleDto scheduleDto);
-    ScheduleDto update(int id, ScheduleDto scheduleDto);
+    List<ScheduleDTO> findAll();
+    List<ScheduleDTO> findByDate(LocalDate date);
+    List<ScheduleDTO> findByDateAndMovieIdAndCinemaId(LocalDate date, int movieId, int cinemaId);
+    ScheduleDTO create(ScheduleDTO scheduleDTO);
+    ScheduleDTO update(int id, ScheduleDTO scheduleDTO);
     void delete(int id);
-    ScheduleDto toDto(Schedule schedule);
-    Schedule toEntity(ScheduleDto scheduleDto);
+    ScheduleDTO toDto(Schedule schedule);
+    Schedule toEntity(ScheduleDTO scheduleDTO);
 }

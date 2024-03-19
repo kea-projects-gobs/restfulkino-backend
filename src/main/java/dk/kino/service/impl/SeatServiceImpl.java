@@ -8,6 +8,7 @@ import dk.kino.service.SeatService;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -18,6 +19,12 @@ public class SeatServiceImpl implements SeatService {
     public SeatServiceImpl(SeatRepository seatRepository) {
         this.seatRepository = seatRepository;
     }
+
+    @Override
+    public Optional<SeatDTO> findSeatById(int id) {
+        return seatRepository.findById(id).map(this::toDto);
+    }
+
     @Override
     public SeatDTO createSeat(SeatDTO seatDTO) {
         Seat seat = toEntity(seatDTO);
