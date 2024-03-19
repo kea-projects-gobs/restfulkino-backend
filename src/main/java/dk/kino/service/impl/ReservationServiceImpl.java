@@ -15,6 +15,7 @@ import dk.kino.service.TicketService;
 import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
@@ -77,6 +78,8 @@ public class ReservationServiceImpl implements ReservationService {
         if(reservation.getTickets().size() < 6) reservation.setFeeOrDiscount(roundToTwoDecimalPlaces(subTotal*FEE));
         if(reservation.getTickets().size() > 10) reservation.setFeeOrDiscount(roundToTwoDecimalPlaces(-subTotal*DISCOUNT));
 
+        reservation.setReservationDate(LocalDate.now());
+
         Reservation savedReservation = reservationRepository.save(reservation);
         for (Ticket ticket : reservation.getTickets()) {
             ticket.setReservation(savedReservation);
@@ -129,9 +132,6 @@ public class ReservationServiceImpl implements ReservationService {
         Set<Seat> seats = reservationReqDTO.getSeatIds().stream().map(id -> Seat.builder().id(id).build()).collect(Collectors.toSet());
         Set<Ticket> tickets = seats.stream().map(seat -> Ticket.builder().seat(seat).build()).collect(Collectors.toSet());
         return Reservation.builder()
-                .id(reservationReqDTO.getId())
-                .feeOrDiscount(reservationReqDTO.getFeeOrDiscount())
-                .reservationDate(reservationReqDTO.getReservationDate())
                 .schedule(Schedule.builder().id(reservationReqDTO.getScheduleId()).build())
                 .tickets(tickets)
                 .build();

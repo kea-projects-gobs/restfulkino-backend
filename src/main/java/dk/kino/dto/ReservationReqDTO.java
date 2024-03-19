@@ -11,9 +11,6 @@ import java.util.Set;
 @AllArgsConstructor
 @Builder
 public class ReservationReqDTO {
-    private int id;
     private int scheduleId;
     private Set<Integer> seatIds;
-    private LocalDate reservationDate;
-    private double feeOrDiscount;
 }
