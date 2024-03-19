@@ -2,11 +2,9 @@ package dk.kino.configuration;
 
 import dk.kino.dto.CinemaDTO;
 import dk.kino.dto.MovieDTO;
-import dk.kino.dto.ScheduleDto;
-import dk.kino.entity.Cinema;
-import dk.kino.entity.Hall;
-import dk.kino.entity.Movie;
-import dk.kino.entity.Schedule;
+import dk.kino.dto.ScheduleDTO;
+import dk.kino.dto.TicketDTO;
+import dk.kino.entity.*;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
@@ -16,6 +14,8 @@ import java.util.List;
 
 import dk.kino.service.MovieService;
 import dk.kino.service.ScheduleService;
+import dk.kino.service.SeatService;
+import dk.kino.service.TicketService;
 import dk.kino.service.cinema.CinemaService;
 import dk.kino.service.hall.HallService;
 import org.springframework.boot.ApplicationArguments;
@@ -29,12 +29,13 @@ public class SetupData implements ApplicationRunner {
     private final CinemaService cinemaService;
     private final MovieService movieService;
     private final ScheduleService scheduleService;
-
-    public SetupData(HallService hallService, CinemaService cinemaService, MovieService movieService,ScheduleService scheduleService) {
+    private final TicketService ticketService;
+    public SetupData(HallService hallService, CinemaService cinemaService, MovieService movieService,ScheduleService scheduleService,TicketService ticketService) {
         this.hallService = hallService;
         this.cinemaService = cinemaService;
         this.movieService = movieService;
         this.scheduleService = scheduleService;
+        this.ticketService = ticketService;
     }
 
     @Override
@@ -94,8 +95,18 @@ public class SetupData implements ApplicationRunner {
                 Schedule.builder().date(LocalDate.parse("2024-03-23")).is3d(false).isLongMovie(false).startTime(LocalTime.parse("14:00:00")).movie(movies.get(0)).hall(halls.get(0)).build()
         );
         schedules.forEach(schedule -> {
-            ScheduleDto scheduleDto = scheduleService.create(scheduleService.toDto(schedule));
+            ScheduleDTO scheduleDto = scheduleService.create(scheduleService.toDto(schedule));
             schedule.setId(scheduleDto.getId());
         });
+
+        // Create Tickets
+        List<Ticket> tickets = Arrays.asList(
+                Ticket.builder().price(80.0).seat(Seat.builder().id(1).build()).build(),
+                Ticket.builder().price(80.0).seat(Seat.builder().id(2).build()).build(),
+                Ticket.builder().price(80.0).seat(Seat.builder().id(3).build()).build(),
+                Ticket.builder().price(80.0).seat(Seat.builder().id(4).build()).build()
+        );
+        ticketService.createTickets(tickets.stream().map(ticketService::toDto).toList());
+
     }
 }

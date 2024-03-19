@@ -1,7 +1,7 @@
 package dk.kino.service.impl;
 
 import dk.kino.dto.MovieDTO;
-import dk.kino.dto.ScheduleDto;
+import dk.kino.dto.ScheduleDTO;
 import dk.kino.entity.Hall;
 import dk.kino.entity.Movie;
 import dk.kino.entity.Schedule;
@@ -30,22 +30,22 @@ public class ScheduleServiceImpl implements ScheduleService {
     }
 
     @Override
-    public List<ScheduleDto> findAll() {
+    public List<ScheduleDTO> findAll() {
         return scheduleRepository.findAll().stream().map(this::toDto).collect(Collectors.toList());
     }
 
     @Override
-    public List<ScheduleDto> findByDate(LocalDate date) {
+    public List<ScheduleDTO> findByDate(LocalDate date) {
             return scheduleRepository.findByDate(date).stream().map(this::toDto).collect(Collectors.toList());
     }
 
     @Override
-    public List<ScheduleDto> findByDateAndMovieIdAndCinemaId(LocalDate date, int movieId, int cinemaId) {
+    public List<ScheduleDTO> findByDateAndMovieIdAndCinemaId(LocalDate date, int movieId, int cinemaId) {
         return scheduleRepository.findByDateAndMovieIdAndCinemaId(date,cinemaId,movieId).stream().map(this::toDto).collect(Collectors.toList());
     }
 
     @Override
-    public ScheduleDto create(ScheduleDto scheduleDto) {
+    public ScheduleDTO create(ScheduleDTO scheduleDto) {
         Schedule schedule = toEntity(scheduleDto);
         validateScheduleUniqueness(schedule);
         schedule.setLongMovie(isLongMovie(schedule));
@@ -54,7 +54,7 @@ public class ScheduleServiceImpl implements ScheduleService {
     }
 
     @Override
-    public ScheduleDto update(int id,ScheduleDto scheduleDto) {
+    public ScheduleDTO update(int id, ScheduleDTO scheduleDto) {
         // Find schedule
         Schedule originalSchedule = scheduleRepository.findById(id).orElseThrow(() -> new RuntimeException(("Unable to find schedule with id=" + id)));
 
@@ -102,8 +102,8 @@ public class ScheduleServiceImpl implements ScheduleService {
     }
 
     @Override
-    public ScheduleDto toDto(Schedule schedule) {
-        return ScheduleDto.builder()
+    public ScheduleDTO toDto(Schedule schedule) {
+        return ScheduleDTO.builder()
                 .id(schedule.getId())
                 .date(schedule.getDate())
                 .startTime(schedule.getStartTime())
@@ -117,7 +117,7 @@ public class ScheduleServiceImpl implements ScheduleService {
     }
 
     @Override
-    public Schedule toEntity(ScheduleDto scheduleDto) {
+    public Schedule toEntity(ScheduleDTO scheduleDto) {
         Hall hall = hallService.convertToEntity(hallService.findByNameAndCinemaName(scheduleDto.getHallName(),scheduleDto.getCinemaName()));
         Movie movie = movieService.toEntity(movieService.findByTitle(scheduleDto.getMovieTitle()).orElse(null));
         Schedule schedule = Schedule.builder()
