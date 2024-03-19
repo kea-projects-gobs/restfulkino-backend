@@ -100,16 +100,16 @@ public class SecurityConfig {
             // Allow for ADMIN to POST, PUT, and DELETE Movies, and ALL to GET
             .requestMatchers(mvcMatcherBuilder.pattern(HttpMethod.GET, "/api/movies")).permitAll()
             .requestMatchers(mvcMatcherBuilder.pattern(HttpMethod.GET, "/api/movies/**")).permitAll()
-            .requestMatchers(mvcMatcherBuilder.pattern(HttpMethod.POST, "/api/movies")).hasAuthority("ADMIN")
-            .requestMatchers(mvcMatcherBuilder.pattern(HttpMethod.PUT, "/api/movies/*")).hasAuthority("ADMIN")
-            .requestMatchers(mvcMatcherBuilder.pattern(HttpMethod.DELETE, "/api/movies/*")).hasAuthority("ADMIN")
+            .requestMatchers(mvcMatcherBuilder.pattern(HttpMethod.POST, "/api/movies")).hasAnyAuthority("ADMIN", "EMPLOYEE")
+            .requestMatchers(mvcMatcherBuilder.pattern(HttpMethod.PUT, "/api/movies/*")).hasAnyAuthority("ADMIN", "EMPLOYEE")
+            .requestMatchers(mvcMatcherBuilder.pattern(HttpMethod.DELETE, "/api/movies/*")).hasAnyAuthority("ADMIN", "EMPLOYEE")
 
             // Allow for ADMIN to POST, PUT, and DELETE Schedules, and ALL to GET
             .requestMatchers(mvcMatcherBuilder.pattern(HttpMethod.GET, "/api/schedules")).permitAll()
             .requestMatchers(mvcMatcherBuilder.pattern(HttpMethod.GET, "/api/schedules/**")).permitAll()
-            .requestMatchers(mvcMatcherBuilder.pattern(HttpMethod.POST, "/api/schedules")).hasAuthority("ADMIN")
-            .requestMatchers(mvcMatcherBuilder.pattern(HttpMethod.PUT, "/api/schedules/*")).hasAuthority("ADMIN")
-            .requestMatchers(mvcMatcherBuilder.pattern(HttpMethod.DELETE, "/api/schedules/*")).hasAuthority("ADMIN")
+            .requestMatchers(mvcMatcherBuilder.pattern(HttpMethod.POST, "/api/schedules")).hasAnyAuthority("ADMIN", "EMPLOYEE")
+            .requestMatchers(mvcMatcherBuilder.pattern(HttpMethod.PUT, "/api/schedules/*")).hasAnyAuthority("ADMIN", "EMPLOYEE")
+            .requestMatchers(mvcMatcherBuilder.pattern(HttpMethod.DELETE, "/api/schedules/*")).hasAnyAuthority("ADMIN", "EMPLOYEE")
 
 
             //Required for error responses
