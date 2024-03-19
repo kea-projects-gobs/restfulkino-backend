@@ -91,14 +91,20 @@ public class ReservationServiceImpl implements ReservationService {
     }
 
     private List<Integer> getReservedSeatIdsByScheduleId(int scheduleId) {
-        // Fetch reservations for the given scheduleId
         List<Reservation> reservations = reservationRepository.findAllByScheduleId(scheduleId);
 
-        // Extract seat IDs from reservations
+        // Extract seat ids
         return reservations.stream()
                 .flatMap(reservation -> reservation.getTickets().stream())
-                .map(ticket -> ticket.getSeat().getId())
-                .collect(Collectors.toList());
+                .map(ticket -> ticket.getSeat().getId()).toList();
+    }
+
+    @Override
+    public List<SeatDTO> findAllReservedSeatsByScheduleId(int scheduleId) {
+        List<Reservation> reservations = reservationRepository.findAllByScheduleId(scheduleId);
+        return reservations.stream()
+                .flatMap(reservation -> reservation.getTickets().stream())
+                .map(Ticket::getSeat).toList().stream().map(seatService::toDto).toList();
     }
 
     @Override
