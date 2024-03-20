@@ -12,5 +12,5 @@ import java.util.Set;
 @Builder
 public class ReservationReqDTO {
     private int scheduleId;
-    private Set<Integer> seatIds;
+    private Set<Integer> seatIndexes;
 }

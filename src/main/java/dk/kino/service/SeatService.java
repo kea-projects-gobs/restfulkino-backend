@@ -9,6 +9,7 @@ import java.util.Set;
 
 public interface SeatService {
     Optional<SeatDTO> findSeatById(int id);
+    List<SeatDTO> findSeatsByHallId(int hallId);
     SeatDTO createSeat(SeatDTO seatDTO);
     List<SeatDTO> createSeats(Set<SeatDTO> seatDTOs);
     void deleteSeats(Set<SeatDTO> seatDTOs);
