@@ -44,7 +44,7 @@ public class PriceServiceImpl implements SeatPriceService, MoviePriceService, Re
 
     @Override
     public SeatPrice updateSeatPrice(String name, SeatPrice seatPrice) {
-        SeatPrice existingSeatPrice = seatPriceRepository.findById(seatPrice.getName()).orElseThrow(() -> new NotFoundException("Could not find seat price name"));
+        SeatPrice existingSeatPrice = seatPriceRepository.findById(name).orElseThrow(() -> new NotFoundException("Could not find seat price name"));
         existingSeatPrice.setUnit(seatPrice.getUnit());
         existingSeatPrice.setAmount(seatPrice.getAmount());
         return seatPriceRepository.save(existingSeatPrice);
@@ -67,7 +67,7 @@ public class PriceServiceImpl implements SeatPriceService, MoviePriceService, Re
 
     @Override
     public MoviePrice updateMoviePrice(String name, MoviePrice moviePrice) {
-        MoviePrice existingMoviePrice = moviePriceRepository.findById(moviePrice.getName()).orElseThrow(() -> new NotFoundException("Could not find seat price name"));
+        MoviePrice existingMoviePrice = moviePriceRepository.findById(name).orElseThrow(() -> new NotFoundException("Could not find seat price name"));
         existingMoviePrice.setUnit(moviePrice.getUnit());
         existingMoviePrice.setAmount(moviePrice.getAmount());
         return moviePriceRepository.save(existingMoviePrice);
@@ -90,7 +90,7 @@ public class PriceServiceImpl implements SeatPriceService, MoviePriceService, Re
 
     @Override
     public ReservationPrice updateReservationPrice(String name, ReservationPrice reservationPrice) {
-        ReservationPrice existingReservationPrice = reservationPriceRepository.findById(reservationPrice.getName()).orElseThrow(() -> new NotFoundException("Could not find seat price name"));
+        ReservationPrice existingReservationPrice = reservationPriceRepository.findById(name).orElseThrow(() -> new NotFoundException("Could not find seat price name"));
         existingReservationPrice.setUnit(reservationPrice.getUnit());
         existingReservationPrice.setAmount(reservationPrice.getAmount());
         return reservationPriceRepository.save(existingReservationPrice);
