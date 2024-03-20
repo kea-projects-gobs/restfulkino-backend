@@ -1,5 +1,6 @@
 package dk.kino.api;
 
+import dk.kino.dto.ReservationPriceCalcDTO;
 import dk.kino.dto.ReservationReqDTO;
 import dk.kino.dto.ReservationResDTO;
 import dk.kino.dto.SeatDTO;
@@ -26,7 +27,7 @@ public class ReservationController {
     }
 
     @PostMapping("/prices")
-    public ResponseEntity<ReservationResDTO> calculatePrice(@RequestBody ReservationReqDTO reservationReqDTO){
+    public ResponseEntity<ReservationPriceCalcDTO> calculatePrice(@RequestBody ReservationReqDTO reservationReqDTO){
         return ResponseEntity.ok().body(reservationService.calculatePrice(reservationReqDTO));
     }
 
