@@ -26,6 +26,11 @@ public class SeatServiceImpl implements SeatService {
     }
 
     @Override
+    public List<SeatDTO> findSeatsByHallId(int hallId) {
+        return seatRepository.findByHallIdAndIsActiveTrue(hallId).stream().map(this::toDto).toList();
+    }
+
+    @Override
     public SeatDTO createSeat(SeatDTO seatDTO) {
         Seat seat = toEntity(seatDTO);
         seat.setActive(true);
