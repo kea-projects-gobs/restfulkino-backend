@@ -10,7 +10,7 @@ import java.util.*;
 import dk.kino.service.MovieService;
 import dk.kino.service.ReservationService;
 import dk.kino.service.ScheduleService;
-import dk.kino.service.TicketService;
+import dk.kino.service.SeatPriceService;
 import dk.kino.service.cinema.CinemaService;
 import dk.kino.service.hall.HallService;
 import org.springframework.boot.ApplicationArguments;
@@ -25,12 +25,14 @@ public class SetupData implements ApplicationRunner {
     private final MovieService movieService;
     private final ScheduleService scheduleService;
     private final ReservationService reservationService;
-    public SetupData(HallService hallService, CinemaService cinemaService, MovieService movieService,ScheduleService scheduleService,ReservationService reservationService) {
+    private final SeatPriceService seatPriceService;
+    public SetupData(HallService hallService, CinemaService cinemaService, MovieService movieService,ScheduleService scheduleService,ReservationService reservationService,SeatPriceService seatPriceService) {
         this.hallService = hallService;
         this.cinemaService = cinemaService;
         this.movieService = movieService;
         this.scheduleService = scheduleService;
         this.reservationService = reservationService;
+        this.seatPriceService = seatPriceService;
     }
 
     @Override
@@ -49,6 +51,14 @@ public class SetupData implements ApplicationRunner {
             CinemaDTO cinemaDTO = cinemaService.createCinema(cinemaService.convertToDTO(cinema));
             cinema.setId(cinemaDTO.getId());
         });
+
+        List<SeatPrice> seatPrices = Arrays.asList(
+                new SeatPrice("economy",80,"DKK"),
+                new SeatPrice("standard",100,"DKK"),
+                new SeatPrice("vip",120,"DKK")
+        );
+
+        seatPrices.forEach(seatPriceService::createSeatPrice);
 
         // Create halls
         List<Hall> halls = new ArrayList<>();
