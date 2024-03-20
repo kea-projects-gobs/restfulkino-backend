@@ -3,8 +3,10 @@ package dk.security.api;
 import dk.security.dto.LoginRequest;
 import dk.security.dto.LoginResponse;
 import dk.security.entity.UserWithRoles;
+import dk.security.service.TokenStore;
 import dk.security.service.UserDetailsServiceImp;
 import io.swagger.v3.oas.annotations.Operation;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -19,10 +21,7 @@ import org.springframework.security.oauth2.jwt.JwsHeader;
 import org.springframework.security.oauth2.jwt.JwtClaimsSet;
 import org.springframework.security.oauth2.jwt.JwtEncoder;
 import org.springframework.security.oauth2.jwt.JwtEncoderParameters;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.time.Instant;
@@ -34,19 +33,22 @@ import static java.util.stream.Collectors.joining;
 @RequestMapping("/api/auth/")
 public class AuthenticationController {
 
+
   @Value("${app.token-issuer}")
   private String tokenIssuer;
 
   @Value("${app.token-expiration}")
   private long tokenExpiration;
 
+  private TokenStore tokenStore;
   private AuthenticationManager authenticationManager;
 
   JwtEncoder encoder;
 
-  public AuthenticationController(AuthenticationConfiguration authenticationConfiguration, JwtEncoder encoder) throws Exception {
+  public AuthenticationController(AuthenticationConfiguration authenticationConfiguration, JwtEncoder encoder, TokenStore tokenStore) throws Exception {
     this.authenticationManager = authenticationConfiguration.getAuthenticationManager();
     this.encoder = encoder;
+    this.tokenStore = tokenStore;
   }
 
   @PostMapping("login")
@@ -74,6 +76,8 @@ public class AuthenticationController {
               .build();
       JwsHeader jwsHeader = JwsHeader.with(() -> "HS256").build();
       String token = encoder.encode(JwtEncoderParameters.from(jwsHeader, claims)).getTokenValue();
+      // Mark the token as valid in TokenStore
+      tokenStore.storeToken(token, true);
       List<String> roles = user.getRoles().stream().map(role -> role.getRoleName()).toList();
       return ResponseEntity.ok()
               .body(new LoginResponse(user.getUsername(), token, roles));
@@ -82,5 +86,17 @@ public class AuthenticationController {
       // AuthenticationServiceException is thrown if the user is not found
       throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, UserDetailsServiceImp.WRONG_USERNAME_OR_PASSWORD);
     }
+  }
+
+  @PostMapping("/logout")
+  @Operation(summary = "Logout", description = "Used to invalidate token on logout")
+  public ResponseEntity<?> logout(@RequestHeader("Authorization") String authHeader) {
+      if (authHeader != null && authHeader.startsWith("Bearer ")) {
+          String token = authHeader.substring(7);
+          // Attempt to invalidate the token if it exists, but don't error if the token is invalid or expired
+          tokenStore.invalidateToken(token);
+      }
+      // Always return a successful response to ensure the client can "log out"
+      return ResponseEntity.ok().build();
   }
 }

@@ -3,6 +3,9 @@ package dk.security.config;
 import com.nimbusds.jose.jwk.source.ImmutableSecret;
 import dk.security.error.CustomOAuth2AccessDeniedHandler;
 import dk.security.error.CustomOAuth2AuthenticationEntryPoint;
+import dk.security.filter.TokenValidationFilter;
+import dk.security.service.TokenStore;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -21,6 +24,7 @@ import org.springframework.security.oauth2.jwt.NimbusJwtEncoder;
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationConverter;
 import org.springframework.security.oauth2.server.resource.authentication.JwtGrantedAuthoritiesConverter;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.security.web.servlet.util.matcher.MvcRequestMatcher;
 import org.springframework.web.servlet.handler.HandlerMappingIntrospector;
 
@@ -33,13 +37,24 @@ import javax.crypto.spec.SecretKeySpec;
 @Configuration
 public class SecurityConfig {
 
+  @Autowired
+  private TokenStore tokenStore;
+
   @Value("${app.secret-key}")
   private String tokenSecret;
+
+  @Bean
+  public TokenValidationFilter tokenValidationFilter() {
+    return new TokenValidationFilter(tokenStore);
+  }
 
   @Bean
   public SecurityFilterChain securityFilterChain(HttpSecurity http, HandlerMappingIntrospector introspector) throws Exception {
     MvcRequestMatcher.Builder mvcMatcherBuilder = new MvcRequestMatcher.Builder(introspector);
     http
+            // Registers the custom TokenValidationFilter to be executed before the UsernamePasswordAuthenticationFilter.
+            // This ensures that the token validation logic is applied to every request before attempting authentication.
+            .addFilterBefore(tokenValidationFilter(), UsernamePasswordAuthenticationFilter.class)
             .cors(Customizer.withDefaults()) //Will use the CorsConfigurationSource bean declared in CorsConfig.java
             .csrf(csrf -> csrf.disable())  //We can disable csrf, since we are using token based authentication, not cookie based
             .sessionManagement((session) -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
@@ -53,6 +68,7 @@ public class SecurityConfig {
 
     http.authorizeHttpRequests((authorize) -> authorize
             .requestMatchers(mvcMatcherBuilder.pattern(HttpMethod.POST, "/api/auth/login")).permitAll()
+            .requestMatchers(mvcMatcherBuilder.pattern(HttpMethod.POST, "/api/auth/logout")).authenticated()
             .requestMatchers(mvcMatcherBuilder.pattern(HttpMethod.POST, "/api/user-with-role")).permitAll() //Clients can create a user for themself
 
             //This is for demo purposes only, and should be removed for a real system
@@ -84,16 +100,16 @@ public class SecurityConfig {
             // Allow for ADMIN to POST, PUT, and DELETE Movies, and ALL to GET
             .requestMatchers(mvcMatcherBuilder.pattern(HttpMethod.GET, "/api/movies")).permitAll()
             .requestMatchers(mvcMatcherBuilder.pattern(HttpMethod.GET, "/api/movies/**")).permitAll()
-            .requestMatchers(mvcMatcherBuilder.pattern(HttpMethod.POST, "/api/movies")).hasAuthority("ADMIN")
-            .requestMatchers(mvcMatcherBuilder.pattern(HttpMethod.PUT, "/api/movies/*")).hasAuthority("ADMIN")
-            .requestMatchers(mvcMatcherBuilder.pattern(HttpMethod.DELETE, "/api/movies/*")).hasAuthority("ADMIN")
+            .requestMatchers(mvcMatcherBuilder.pattern(HttpMethod.POST, "/api/movies")).hasAnyAuthority("ADMIN", "EMPLOYEE")
+            .requestMatchers(mvcMatcherBuilder.pattern(HttpMethod.PUT, "/api/movies/*")).hasAnyAuthority("ADMIN", "EMPLOYEE")
+            .requestMatchers(mvcMatcherBuilder.pattern(HttpMethod.DELETE, "/api/movies/*")).hasAnyAuthority("ADMIN", "EMPLOYEE")
 
             // Allow for ADMIN to POST, PUT, and DELETE Schedules, and ALL to GET
             .requestMatchers(mvcMatcherBuilder.pattern(HttpMethod.GET, "/api/schedules")).permitAll()
             .requestMatchers(mvcMatcherBuilder.pattern(HttpMethod.GET, "/api/schedules/**")).permitAll()
-            .requestMatchers(mvcMatcherBuilder.pattern(HttpMethod.POST, "/api/schedules")).hasAuthority("ADMIN")
-            .requestMatchers(mvcMatcherBuilder.pattern(HttpMethod.PUT, "/api/schedules/*")).hasAuthority("ADMIN")
-            .requestMatchers(mvcMatcherBuilder.pattern(HttpMethod.DELETE, "/api/schedules/*")).hasAuthority("ADMIN")
+            .requestMatchers(mvcMatcherBuilder.pattern(HttpMethod.POST, "/api/schedules")).hasAnyAuthority("ADMIN", "EMPLOYEE")
+            .requestMatchers(mvcMatcherBuilder.pattern(HttpMethod.PUT, "/api/schedules/*")).hasAnyAuthority("ADMIN", "EMPLOYEE")
+            .requestMatchers(mvcMatcherBuilder.pattern(HttpMethod.DELETE, "/api/schedules/*")).hasAnyAuthority("ADMIN", "EMPLOYEE")
 
             .requestMatchers(mvcMatcherBuilder.pattern(HttpMethod.POST, "/api/reservations")).permitAll()
             .requestMatchers(mvcMatcherBuilder.pattern(HttpMethod.GET, "/api/reservations/schedules/**")).permitAll()
