@@ -14,4 +14,5 @@ public class TicketDTO {
     private int id;
     private int seatId;
     private double price;
+    private int reservationId;
 }
