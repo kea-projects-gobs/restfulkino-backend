@@ -40,6 +40,71 @@ public class ReservationServiceImpl implements ReservationService {
     }
 
     @Override
+    public ReservationResDTO calculatePrice(ReservationReqDTO reservationReqDTO) {
+        // USE PRICE SERVICE
+        double PRICE_LONG_MOVIE = 20.0;
+        double PRICE_3D = 10.0;
+        double FEE = 0.07;
+        double DISCOUNT = 0.05;
+
+        double TICKET_PRICE_ADJUSTMENT = 0;
+
+        Reservation reservation = toEntity(reservationReqDTO);
+        ScheduleDTO scheduleDTO = scheduleService.findById(reservation.getSchedule().getId()).orElseThrow(() -> new NotFoundException("Schedule not found"));
+        HallDTO hallDTO = hallService.findByNameAndCinemaName(scheduleDTO.getHallName(),scheduleDTO.getCinemaName());
+        List<SeatDTO> seatDTOs = seatService.findSeatsByHallId(hallDTO.getId());
+
+        // Adjust prices
+        if(scheduleDTO.isLongMovie()) TICKET_PRICE_ADJUSTMENT+=PRICE_LONG_MOVIE;
+        if(scheduleDTO.is3d()) TICKET_PRICE_ADJUSTMENT+=PRICE_3D;
+
+        // Get reserved seats
+        List<Integer> seatIdsReserved = getReservedSeatIdsByScheduleId(scheduleDTO.getId());
+
+        double subTotal = 0;
+
+        // Create tickets
+        for (Ticket ticket : reservation.getTickets()) {
+
+            // Get seat id from seatIndex
+            int seatId = seatDTOs.stream()
+                    .filter(seat -> seat.getSeatIndex() == ticket.getSeat().getSeatIndex())
+                    .map(SeatDTO::getId)
+                    .findFirst().orElseThrow(() -> new NotFoundException("Seat is not found"));
+
+            // Set seat id on ticket
+            ticket.getSeat().setId(seatId);
+
+            if(seatIdsReserved.contains(seatId)) throw new BadRequestException("Seat is already taken");
+
+            // SET SEAT
+            SeatDTO seatDTO = seatService.findSeatById(seatId).orElseThrow(() -> new NotFoundException("Seat not found"));
+
+//            // Check if seat belongs to hall
+//            if(seatDTO.getHallId() != hallDTO.getId()) throw new BadRequestException("Seat does not belong to Hall");
+
+            ticket.setSeat(seatService.toEntity(seatDTO));
+            // SET PRICE
+            double ticketPrice = seatDTO.getCurrentPrice()+TICKET_PRICE_ADJUSTMENT;
+            ticket.setPrice(ticketPrice);
+            subTotal+=ticketPrice;
+        }
+
+        if(reservation.getTickets().size() < 6) reservation.setFeeOrDiscount(roundToTwoDecimalPlaces(subTotal*FEE));
+        if(reservation.getTickets().size() > 10) reservation.setFeeOrDiscount(roundToTwoDecimalPlaces(-subTotal*DISCOUNT));
+
+        reservation.setReservationDate(LocalDate.now());
+
+//        Reservation savedReservation = reservationRepository.save(reservation);
+        for (Ticket ticket : reservation.getTickets()) {
+            ticket.setReservation(reservation);
+        }
+//        ticketService.createTickets(reservation.getTickets().stream().map(ticketService::toDto).collect(Collectors.toList()));
+
+        return toDto(reservation);
+    }
+
+    @Override
     @Transactional
     public ReservationResDTO createReservation(ReservationReqDTO reservationReqDTO) {
         // USE PRICE SERVICE

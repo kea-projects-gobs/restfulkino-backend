@@ -9,6 +9,7 @@ import java.util.List;
 import java.util.Optional;
 
 public interface ReservationService {
+    ReservationResDTO calculatePrice(ReservationReqDTO reservationReqDTO);
     ReservationResDTO createReservation(ReservationReqDTO reservationReqDTO);
     Optional<ReservationResDTO> findReservationById(int id);
     List<SeatDTO> findAllReservedSeatsByScheduleId(int scheduleId);
