@@ -138,6 +138,6 @@ public class SetupData implements ApplicationRunner {
                 ReservationReqDTO.builder().seatIndexes(seatIds2).scheduleId(schedules.get(0).getId()).build(),
                 ReservationReqDTO.builder().seatIndexes(seatIds3).scheduleId(schedules.get(0).getId()).build()
         );
-        reservations.forEach(reservationService::createReservation);
+//        reservations.forEach(reservationService::createReservation);
     }
 }
