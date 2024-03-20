@@ -24,6 +24,11 @@ public class ReservationController {
         return ResponseEntity.ok().body(reservationService.createReservation(reservationReqDTO));
     }
 
+    @PostMapping("/prices")
+    public ResponseEntity<ReservationResDTO> calculatePrice(@RequestBody ReservationReqDTO reservationReqDTO){
+        return ResponseEntity.ok().body(reservationService.calculatePrice(reservationReqDTO));
+    }
+
     @GetMapping("/schedules/{id}/seats")
     public ResponseEntity<List<SeatDTO>> findAllReservedSeatsByScheduleId(@PathVariable int id) {
         return ResponseEntity.ok().body(reservationService.findAllReservedSeatsByScheduleId(id));
