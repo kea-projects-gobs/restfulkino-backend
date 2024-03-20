@@ -7,10 +7,7 @@ import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.*;
 
-import dk.kino.service.MovieService;
-import dk.kino.service.ReservationService;
-import dk.kino.service.ScheduleService;
-import dk.kino.service.TicketService;
+import dk.kino.service.*;
 import dk.kino.service.cinema.CinemaService;
 import dk.kino.service.hall.HallService;
 import org.springframework.boot.ApplicationArguments;
@@ -25,12 +22,20 @@ public class SetupData implements ApplicationRunner {
     private final MovieService movieService;
     private final ScheduleService scheduleService;
     private final ReservationService reservationService;
-    public SetupData(HallService hallService, CinemaService cinemaService, MovieService movieService,ScheduleService scheduleService,ReservationService reservationService) {
+    private final SeatPriceService seatPriceService;
+    private final MoviePriceService moviePriceService;
+    private final ReservationPriceService reservationPriceService;
+    public SetupData(HallService hallService, CinemaService cinemaService, MovieService movieService,ScheduleService scheduleService,
+                     ReservationService reservationService,SeatPriceService seatPriceService,
+                     MoviePriceService moviePriceService,ReservationPriceService reservationPriceService) {
         this.hallService = hallService;
         this.cinemaService = cinemaService;
         this.movieService = movieService;
         this.scheduleService = scheduleService;
         this.reservationService = reservationService;
+        this.seatPriceService = seatPriceService;
+        this.moviePriceService = moviePriceService;
+        this.reservationPriceService = reservationPriceService;
     }
 
     @Override
@@ -49,6 +54,26 @@ public class SetupData implements ApplicationRunner {
             CinemaDTO cinemaDTO = cinemaService.createCinema(cinemaService.convertToDTO(cinema));
             cinema.setId(cinemaDTO.getId());
         });
+
+        // CREATE PRICES
+        List<SeatPrice> seatPrices = Arrays.asList(
+                new SeatPrice("economy",80,"DKK"),
+                new SeatPrice("standard",100,"DKK"),
+                new SeatPrice("vip",120,"DKK")
+        );
+        seatPrices.forEach(seatPriceService::createSeatPrice);
+
+        List<MoviePrice> moviePrices = Arrays.asList(
+                new MoviePrice("longMovie",25,"DKK"),
+                new MoviePrice("threeD",20,"DKK")
+        );
+        moviePrices.forEach(moviePriceService::createMoviePrice);
+
+        List<ReservationPrice> reservationPrices = Arrays.asList(
+                new ReservationPrice("fee",0.07,"percentInDecimal"),
+                new ReservationPrice("discount",0.05,"percentInDecimal")
+        );
+        reservationPrices.forEach(reservationPriceService::createReservationPrice);
 
         // Create halls
         List<Hall> halls = new ArrayList<>();
@@ -113,6 +138,6 @@ public class SetupData implements ApplicationRunner {
                 ReservationReqDTO.builder().seatIndexes(seatIds2).scheduleId(schedules.get(0).getId()).build(),
                 ReservationReqDTO.builder().seatIndexes(seatIds3).scheduleId(schedules.get(0).getId()).build()
         );
-        reservations.forEach(reservationService::createReservation);
+//        reservations.forEach(reservationService::createReservation);
     }
 }
