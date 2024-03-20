@@ -115,6 +115,8 @@ public class SecurityConfig {
             .requestMatchers(mvcMatcherBuilder.pattern(HttpMethod.POST, "/api/reservations/prices")).permitAll()
             .requestMatchers(mvcMatcherBuilder.pattern(HttpMethod.GET, "/api/reservations/schedules/**")).permitAll()
 
+            .requestMatchers(mvcMatcherBuilder.pattern(HttpMethod.GET, "/api/prices/**")).hasAnyAuthority("ADMIN", "EMPLOYEE")
+            .requestMatchers(mvcMatcherBuilder.pattern(HttpMethod.PUT, "/api/prices/**")).hasAnyAuthority("ADMIN", "EMPLOYEE")
 
             //Required for error responses
             .requestMatchers(mvcMatcherBuilder.pattern("/error")).permitAll());
