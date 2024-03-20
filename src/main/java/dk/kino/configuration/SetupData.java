@@ -5,7 +5,9 @@ import dk.kino.entity.*;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
+import java.time.format.DateTimeFormatter;
 import java.util.*;
+import java.util.stream.Collectors;
 
 import dk.kino.service.MovieService;
 import dk.kino.service.ReservationService;
@@ -85,20 +87,64 @@ public class SetupData implements ApplicationRunner {
             movie.setId(movieDTO.getId());
         });
 
-        // Create Schedule
-        List<Schedule> schedules = Arrays.asList(
-                Schedule.builder().date(LocalDate.parse("2024-03-20")).is3d(false).isLongMovie(false).startTime(LocalTime.parse("14:00:00")).movie(movies.get(0)).hall(halls.get(0)).build(),
-                Schedule.builder().date(LocalDate.parse("2024-03-21")).is3d(false).isLongMovie(false).startTime(LocalTime.parse("14:00:00")).movie(movies.get(0)).hall(halls.get(0)).build(),
-                Schedule.builder().date(LocalDate.parse("2024-03-22")).is3d(false).isLongMovie(false).startTime(LocalTime.parse("14:00:00")).movie(movies.get(0)).hall(halls.get(0)).build(),
-                Schedule.builder().date(LocalDate.parse("2024-03-23")).is3d(false).isLongMovie(false).startTime(LocalTime.parse("14:00:00")).movie(movies.get(0)).hall(halls.get(0)).build()
+        // Screening times
+        List<LocalTime> screeningTimes = Arrays.asList(
+                LocalTime.parse("10:00:00"),
+                LocalTime.parse("14:00:00"),
+                LocalTime.parse("18:00:00"),
+                LocalTime.parse("22:00:00")
         );
-        schedules.forEach(schedule -> {
-            ScheduleDTO scheduleDTO = scheduleService.create(scheduleService.toDto(schedule));
-            schedule.setId(scheduleDTO.getId());
-        });
 
+        List<Schedule> schedules = new ArrayList<>();
 
-        // Reservations
+        // Filter movies that have release date not later than now
+        List<Movie> filteredMovies = movies.stream()
+            .filter(movie -> !movie.getReleaseDate().isAfter(LocalDate.now()))
+            .collect(Collectors.toList());
+
+            LocalDate today = LocalDate.now();
+            int movieIndex = 0; // Start with the first movie
+            for (int dayOffset = 0; dayOffset < 5; dayOffset++) {
+                LocalDate scheduleDate = today.plusDays(dayOffset);
+            
+                for (Cinema cinema : cinemas) {
+                    List<Hall> cinemaHalls = halls.stream()
+                            .filter(hall -> hall.getCinema().getId() == cinema.getId())
+                            .collect(Collectors.toList());
+            
+                    // Rotate through movies for each hall
+                    for (Hall hall : cinemaHalls) {
+                        // Select a movie based on the current index
+                        Movie movie = filteredMovies.get(movieIndex % filteredMovies.size());
+                        boolean isLongMovie = movie.getDuration() >= 170;
+            
+                        // Select a time slot for this movie (for simplicity, just one time slot per movie per day)
+                        LocalTime time = screeningTimes.get(dayOffset % screeningTimes.size());
+            
+                        try {
+                            Schedule schedule = Schedule.builder()
+                                    .date(scheduleDate)
+                                    .startTime(time)
+                                    .movie(movie)
+                                    .hall(hall)
+                                    .is3d(false)
+                                    .isLongMovie(isLongMovie)
+                                    .build();
+            
+                            ScheduleDTO scheduleDTO = scheduleService.create(scheduleService.toDto(schedule));
+                            schedule.setId(scheduleDTO.getId());
+                            schedules.add(schedule);
+                        } catch (RuntimeException e) {
+                            System.out.println("Could not create schedule for movie " + movie.getTitle() + " at " + time.format(DateTimeFormatter.ofPattern("HH:mm")) + " in hall " + hall.getName() + " on " + scheduleDate + ": " + e.getMessage());
+                        }
+            
+                        // Move to the next movie for the next hall
+                        movieIndex++;
+                    }
+                }
+            }
+
+                    // Reservations
         Set<Integer> seatIds1 = new HashSet<>();
         Set<Integer> seatIds2 = new HashSet<>();
         Set<Integer> seatIds3 = new HashSet<>();
