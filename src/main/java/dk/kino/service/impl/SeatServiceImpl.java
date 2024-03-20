@@ -59,7 +59,7 @@ public class SeatServiceImpl implements SeatService {
                 .id(entity.getId())
                 .seatIndex(entity.getSeatIndex())
                 .hallId(entity.getHall().getId())
-                .seatPriceId(entity.getSeatPrice().getName())
+                .seatPriceName(entity.getSeatPrice().getName())
                 .build();
     }
 
@@ -70,7 +70,7 @@ public class SeatServiceImpl implements SeatService {
         return Seat.builder()
                 .id(dto.getId())
                 .seatIndex(dto.getSeatIndex())
-                .seatPrice(SeatPrice.builder().name(dto.getSeatPriceId()).build())
+                .seatPrice(SeatPrice.builder().name(dto.getSeatPriceName()).build())
                 .hall(hall)
                 .build();
     }
