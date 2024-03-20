@@ -3,6 +3,7 @@ package dk.kino.service;
 import static org.mockito.Mockito.*;
 
 import dk.kino.dto.TicketDTO;
+import dk.kino.entity.Reservation;
 import dk.kino.entity.Seat;
 import dk.kino.entity.Ticket;
 import dk.kino.repository.TicketRepository;
@@ -30,8 +31,8 @@ public class TicketServiceTest {
     public void testGetTicketById_ExistingId_ReturnsTicketDTO() {
         // Arrange
         int id = 1;
-        Ticket ticket = Ticket.builder().id(id).price(10.0).seat(Seat.builder().id(1).build()).build();
-        TicketDTO expectedTicketDTO = TicketDTO.builder().id(id).price(10.0).seatId(1).build();
+        Ticket ticket = Ticket.builder().id(id).price(10.0).seat(Seat.builder().id(1).build()).reservation(Reservation.builder().id(1).build()).build();
+        TicketDTO expectedTicketDTO = TicketDTO.builder().id(id).price(10.0).seatId(1).reservationId(1).build();
 
         when(ticketRepository.findById(id)).thenReturn(Optional.of(ticket));
 
@@ -61,8 +62,8 @@ public class TicketServiceTest {
     @Test
     public void testCreateTicket_ValidTicketDTO_CreatesAndReturnsTicketDTO() {
         // Arrange
-        TicketDTO ticketDTO = TicketDTO.builder().price(10.0).seatId(1).build();
-        Ticket savedTicket = Ticket.builder().id(1).price(10.0).seat(Seat.builder().id(1).build()).build();
+        TicketDTO ticketDTO = TicketDTO.builder().price(10.0).seatId(1).reservationId(1).build();
+        Ticket savedTicket = Ticket.builder().id(1).price(10.0).seat(Seat.builder().id(1).build()).reservation(Reservation.builder().id(1).build()).build();
         TicketDTO expectedTicketDTO = TicketDTO.builder().id(1).price(10.0).seatId(1).build();
 
         when(ticketRepository.save(any(Ticket.class))).thenReturn(savedTicket);
@@ -80,12 +81,12 @@ public class TicketServiceTest {
     public void testCreateTickets_ValidTicketDTOs_CreatesAndReturnsTicketDTOs() {
         // Arrange
         List<TicketDTO> ticketDTOs = new ArrayList<>();
-        ticketDTOs.add(TicketDTO.builder().price(10.0).seatId(1).build());
-        ticketDTOs.add(TicketDTO.builder().price(12.0).seatId(2).build());
+        ticketDTOs.add(TicketDTO.builder().price(10.0).seatId(1).reservationId(1).build());
+        ticketDTOs.add(TicketDTO.builder().price(12.0).seatId(2).reservationId(1).build());
 
         List<Ticket> savedTickets = new ArrayList<>();
-        savedTickets.add(Ticket.builder().id(1).price(10.0).seat(Seat.builder().id(1).build()).build());
-        savedTickets.add(Ticket.builder().id(2).price(12.0).seat(Seat.builder().id(2).build()).build());
+        savedTickets.add(Ticket.builder().id(1).price(10.0).seat(Seat.builder().id(1).build()).reservation(Reservation.builder().id(1).build()).build());
+        savedTickets.add(Ticket.builder().id(2).price(12.0).seat(Seat.builder().id(2).build()).reservation(Reservation.builder().id(1).build()).build());
 
         List<TicketDTO> expectedTicketDTOs = new ArrayList<>();
         expectedTicketDTOs.add(TicketDTO.builder().id(1).price(10.0).seatId(1).build());
