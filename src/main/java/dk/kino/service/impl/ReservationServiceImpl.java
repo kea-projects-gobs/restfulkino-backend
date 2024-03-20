@@ -81,7 +81,7 @@ public class ReservationServiceImpl implements ReservationService {
     }
 
     @Override
-    public ReservationResDTO calculatePrice(ReservationReqDTO reservationReqDTO) {
+    public ReservationPriceCalcDTO calculatePrice(ReservationReqDTO reservationReqDTO) {
         // GET PRICES
         List<SeatPrice> seatPrices = getSeatPrices();
         List<MoviePrice> moviePrices = getMoviePrices();
@@ -147,7 +147,7 @@ public class ReservationServiceImpl implements ReservationService {
         }
 //        ticketService.createTickets(reservation.getTickets().stream().map(ticketService::toDto).collect(Collectors.toList()));
 
-        return toDto(reservation);
+        return toReservationPriceCalcDTO(reservation);
     }
 
     @Override
@@ -273,6 +273,22 @@ public class ReservationServiceImpl implements ReservationService {
         return Reservation.builder()
                 .schedule(Schedule.builder().id(reservationReqDTO.getScheduleId()).build())
                 .tickets(tickets)
+                .build();
+    }
+
+    private ReservationPriceCalcDTO toReservationPriceCalcDTO(Reservation reservation) {
+        return ReservationPriceCalcDTO.builder()
+                .scheduleId(reservation.getId())
+                .feeOrDiscount(reservation.getFeeOrDiscount())
+                .tickets(reservation.getTickets().stream().map(this::toTicketPriceCalcDTO).collect(Collectors.toSet()))
+                .build();
+    }
+
+    private TicketPriceCalcDTO toTicketPriceCalcDTO(Ticket ticket) {
+        return TicketPriceCalcDTO.builder()
+                .seatId(ticket.getSeat().getId())
+                .seatIndex(ticket.getSeat().getSeatIndex())
+                .price(ticket.getPrice())
                 .build();
     }
 }
