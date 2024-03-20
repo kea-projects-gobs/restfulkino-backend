@@ -4,17 +4,16 @@ import dk.kino.dto.HallDTO;
 import dk.kino.dto.SeatDTO;
 import dk.kino.entity.Hall;
 import dk.kino.entity.Seat;
+import dk.kino.entity.SeatPrice;
 import dk.kino.exception.BadRequestException;
 import dk.kino.repository.CinemaRepository;
 import dk.kino.repository.HallRepository;
+import dk.kino.service.SeatPriceService;
 import dk.kino.service.SeatService;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.HashSet;
-import java.util.List;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -23,11 +22,13 @@ public class HallServiceImpl implements HallService {
     private final HallRepository hallRepository;
     private final CinemaRepository cinemaRepository;
     private final SeatService seatService;
+    private final SeatPriceService seatPriceService;
 
-    public HallServiceImpl(HallRepository hallRepository, CinemaRepository cinemaRepository,SeatService seatService) {
+    public HallServiceImpl(HallRepository hallRepository, CinemaRepository cinemaRepository,SeatService seatService,SeatPriceService seatPriceService) {
         this.hallRepository = hallRepository;
         this.cinemaRepository = cinemaRepository;
         this.seatService = seatService;
+        this.seatPriceService = seatPriceService;
     }
 
     @Override
@@ -102,18 +103,34 @@ public class HallServiceImpl implements HallService {
         int noOfRows = hall.getNoOfRows();
         Set<Seat> seats = new HashSet<>();
         int seatIndex = 0;
+
+        List<SeatPrice> seatPrices = seatPriceService.findAll();
+
+        SeatPrice economyPrice = seatPrices.stream()
+                .filter(seatPrice -> "economy".equalsIgnoreCase(seatPrice.getName()))
+                .findFirst()
+                .orElse(null);
+        SeatPrice standardPrice = seatPrices.stream()
+                .filter(seatPrice -> "standard".equalsIgnoreCase(seatPrice.getName()))
+                .findFirst()
+                .orElse(null);
+        SeatPrice vipPrice = seatPrices.stream()
+                .filter(seatPrice -> "vip".equalsIgnoreCase(seatPrice.getName()))
+                .findFirst()
+                .orElse(null);
+
         for (int row = 1; row <= noOfRows; row++) {
-            double seatPrice = 80;
+            SeatPrice seatPrice = economyPrice;
             if (row > 2) {
-                seatPrice = 100;
+                seatPrice = standardPrice;
             }
             if (row ==  noOfRows) {
-                seatPrice = 120;
+                seatPrice = vipPrice;
             }
             for (int col = 1; col <= noOfCols; col++) {
                 seats.add(Seat.builder()
                         .seatIndex(seatIndex)
-                        .currentPrice(seatPrice)
+                        .seatPrice(seatPrice)
                         .hall(hall)
                         .build());
                 ++seatIndex;

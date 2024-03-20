@@ -8,10 +8,7 @@ import dk.kino.entity.Ticket;
 import dk.kino.exception.BadRequestException;
 import dk.kino.exception.NotFoundException;
 import dk.kino.repository.ReservationRepository;
-import dk.kino.service.ReservationService;
-import dk.kino.service.ScheduleService;
-import dk.kino.service.SeatService;
-import dk.kino.service.TicketService;
+import dk.kino.service.*;
 import dk.kino.service.hall.HallService;
 import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Service;
@@ -30,13 +27,15 @@ public class ReservationServiceImpl implements ReservationService {
     private final SeatService seatService;
     private final ScheduleService scheduleService;
     private final HallService hallService;
+    private final SeatPriceService seatPriceService;
 
-    public ReservationServiceImpl(ReservationRepository reservationRepository,TicketService ticketService,SeatService seatService,ScheduleService scheduleService,HallService hallService) {
+    public ReservationServiceImpl(ReservationRepository reservationRepository,TicketService ticketService,SeatService seatService,ScheduleService scheduleService,HallService hallService,SeatPriceService seatPriceService) {
         this.reservationRepository = reservationRepository;
         this.ticketService = ticketService;
         this.seatService = seatService;
         this.scheduleService = scheduleService;
         this.hallService = hallService;
+        this.seatPriceService = seatPriceService;
     }
 
     @Override
@@ -84,8 +83,11 @@ public class ReservationServiceImpl implements ReservationService {
 //            if(seatDTO.getHallId() != hallDTO.getId()) throw new BadRequestException("Seat does not belong to Hall");
 
             ticket.setSeat(seatService.toEntity(seatDTO));
+
+            double seatPrice = seatPriceService.findByName(seatDTO.getSeatPriceId()).orElseThrow(() -> new BadRequestException("Seat Price not found")).getAmount();
+
             // SET PRICE
-            double ticketPrice = seatDTO.getCurrentPrice()+TICKET_PRICE_ADJUSTMENT;
+            double ticketPrice = seatPrice+TICKET_PRICE_ADJUSTMENT;
             ticket.setPrice(ticketPrice);
             subTotal+=ticketPrice;
         }
@@ -150,8 +152,11 @@ public class ReservationServiceImpl implements ReservationService {
 //            if(seatDTO.getHallId() != hallDTO.getId()) throw new BadRequestException("Seat does not belong to Hall");
             
             ticket.setSeat(seatService.toEntity(seatDTO));
+
+            double seatPrice = seatPriceService.findByName(seatDTO.getSeatPriceId()).orElseThrow(() -> new BadRequestException("Seat Price not found")).getAmount();
+
             // SET PRICE
-            double ticketPrice = seatDTO.getCurrentPrice()+TICKET_PRICE_ADJUSTMENT;
+            double ticketPrice = seatPrice+TICKET_PRICE_ADJUSTMENT;
             ticket.setPrice(ticketPrice);
             subTotal+=ticketPrice;
         }

@@ -3,6 +3,7 @@ package dk.kino.service.impl;
 import dk.kino.dto.SeatDTO;
 import dk.kino.entity.Hall;
 import dk.kino.entity.Seat;
+import dk.kino.entity.SeatPrice;
 import dk.kino.repository.SeatRepository;
 import dk.kino.service.SeatService;
 import org.springframework.stereotype.Service;
@@ -58,7 +59,7 @@ public class SeatServiceImpl implements SeatService {
                 .id(entity.getId())
                 .seatIndex(entity.getSeatIndex())
                 .hallId(entity.getHall().getId())
-                .currentPrice(entity.getCurrentPrice())
+                .seatPriceId(entity.getSeatPrice().getName())
                 .build();
     }
 
@@ -69,7 +70,7 @@ public class SeatServiceImpl implements SeatService {
         return Seat.builder()
                 .id(dto.getId())
                 .seatIndex(dto.getSeatIndex())
-                .currentPrice(dto.getCurrentPrice())
+                .seatPrice(SeatPrice.builder().name(dto.getSeatPriceId()).build())
                 .hall(hall)
                 .build();
     }
