@@ -111,7 +111,7 @@ public class SecurityConfig {
             .requestMatchers(mvcMatcherBuilder.pattern(HttpMethod.PUT, "/api/schedules/*")).hasAnyAuthority("ADMIN", "EMPLOYEE")
             .requestMatchers(mvcMatcherBuilder.pattern(HttpMethod.DELETE, "/api/schedules/*")).hasAnyAuthority("ADMIN", "EMPLOYEE")
 
-            .requestMatchers(mvcMatcherBuilder.pattern(HttpMethod.POST, "/api/reservations")).permitAll()
+            .requestMatchers(mvcMatcherBuilder.pattern(HttpMethod.POST, "/api/reservations")).hasAnyAuthority("USER")
             .requestMatchers(mvcMatcherBuilder.pattern(HttpMethod.POST, "/api/reservations/prices")).permitAll()
             .requestMatchers(mvcMatcherBuilder.pattern(HttpMethod.GET, "/api/reservations/schedules/**")).permitAll()
 

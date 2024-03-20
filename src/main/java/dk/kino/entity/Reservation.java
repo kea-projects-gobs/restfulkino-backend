@@ -1,5 +1,6 @@
 package dk.kino.entity;
 
+import dk.security.entity.UserWithRoles;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -24,4 +25,6 @@ public class Reservation {
     @Temporal(TemporalType.DATE)
     private LocalDate reservationDate;
     private double feeOrDiscount; // Fee (positive) or discount (negative) applied to the reservation
+    @ManyToOne
+    private UserWithRoles user;
 }

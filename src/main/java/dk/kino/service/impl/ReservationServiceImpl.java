@@ -7,9 +7,12 @@ import dk.kino.exception.NotFoundException;
 import dk.kino.repository.ReservationRepository;
 import dk.kino.service.*;
 import dk.kino.service.hall.HallService;
+import dk.security.entity.UserWithRoles;
+import dk.security.service.UserWithRolesService;
 import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Service;
 
+import java.security.Principal;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
@@ -27,10 +30,12 @@ public class ReservationServiceImpl implements ReservationService {
     private final SeatPriceService seatPriceService;
     private final MoviePriceService moviePriceService;
     private final ReservationPriceService reservationPriceService;
+    private final UserWithRolesService userWithRolesService;
 
     public ReservationServiceImpl(ReservationRepository reservationRepository,TicketService ticketService,SeatService seatService,
                                   ScheduleService scheduleService,HallService hallService,SeatPriceService seatPriceService,
-                                  MoviePriceService moviePriceService,ReservationPriceService reservationPriceService) {
+                                  MoviePriceService moviePriceService,ReservationPriceService reservationPriceService,
+                                  UserWithRolesService userWithRolesService) {
         this.reservationRepository = reservationRepository;
         this.ticketService = ticketService;
         this.seatService = seatService;
@@ -39,6 +44,7 @@ public class ReservationServiceImpl implements ReservationService {
         this.seatPriceService = seatPriceService;
         this.moviePriceService = moviePriceService;
         this.reservationPriceService = reservationPriceService;
+        this.userWithRolesService = userWithRolesService;
     }
 
     private List<MoviePrice> getMoviePrices() {
@@ -146,7 +152,7 @@ public class ReservationServiceImpl implements ReservationService {
 
     @Override
     @Transactional
-    public ReservationResDTO createReservation(ReservationReqDTO reservationReqDTO) {
+    public ReservationResDTO createReservation(ReservationReqDTO reservationReqDTO, Principal principal) {
         // GET PRICES
         List<SeatPrice> seatPrices = getSeatPrices();
         List<MoviePrice> moviePrices = getMoviePrices();
@@ -204,6 +210,14 @@ public class ReservationServiceImpl implements ReservationService {
         if(reservation.getTickets().size() > 10) reservation.setFeeOrDiscount(roundToTwoDecimalPlaces(-subTotal*DISCOUNT));
 
         reservation.setReservationDate(LocalDate.now());
+
+        // ADD user
+
+        String currentUserName = principal.getName();
+        userWithRolesService.getUserWithRoles(currentUserName);
+        UserWithRoles userWithRoles = new UserWithRoles();
+        userWithRoles.setUsername(currentUserName);
+        reservation.setUser(userWithRoles);
 
         Reservation savedReservation = reservationRepository.save(reservation);
         for (Ticket ticket : reservation.getTickets()) {
