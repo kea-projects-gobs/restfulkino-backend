@@ -20,6 +20,7 @@ public class ScheduleDTO {
     private boolean is3d;
     @JsonProperty("isLongMovie")
     private boolean isLongMovie;
-    private int movieId;
-    private int hallId;
+    private String movieTitle;
+    private String hallName;
+    private String cinemaName;
 }

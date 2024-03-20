@@ -116,15 +116,16 @@ public class ScheduleServiceImpl implements ScheduleService {
                 .endTime(schedule.getEndTime())
                 .is3d(schedule.is3d())
                 .isLongMovie(schedule.isLongMovie())
-                .hallId(schedule.getHall().getId())
-                .movieId(schedule.getMovie().getId())
+                .hallName(schedule.getHall().getName())
+                .movieTitle(schedule.getMovie().getTitle())
+                .cinemaName(schedule.getHall().getCinema().getName())
                 .build();
     }
 
     @Override
     public Schedule toEntity(ScheduleDTO scheduleDTO) {
-        Hall hall = hallService.convertToEntity(hallService.findById(scheduleDTO.getHallId()));
-        Movie movie = movieService.toEntity(movieService.findById(scheduleDTO.getMovieId()).orElse(null));
+        Hall hall = hallService.convertToEntity(hallService.findByNameAndCinemaName(scheduleDTO.getHallName(), scheduleDTO.getCinemaName()));
+        Movie movie = movieService.toEntity(movieService.findByTitle(scheduleDTO.getMovieTitle()).orElse(null));
         Schedule schedule = Schedule.builder()
                 .id(scheduleDTO.getId())
                 .date(scheduleDTO.getDate())

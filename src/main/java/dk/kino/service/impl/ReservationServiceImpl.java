@@ -12,6 +12,7 @@ import dk.kino.service.ReservationService;
 import dk.kino.service.ScheduleService;
 import dk.kino.service.SeatService;
 import dk.kino.service.TicketService;
+import dk.kino.service.hall.HallService;
 import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Service;
 
@@ -28,12 +29,14 @@ public class ReservationServiceImpl implements ReservationService {
     private final TicketService ticketService;
     private final SeatService seatService;
     private final ScheduleService scheduleService;
+    private final HallService hallService;
 
-    public ReservationServiceImpl(ReservationRepository reservationRepository,TicketService ticketService,SeatService seatService,ScheduleService scheduleService) {
+    public ReservationServiceImpl(ReservationRepository reservationRepository,TicketService ticketService,SeatService seatService,ScheduleService scheduleService,HallService hallService) {
         this.reservationRepository = reservationRepository;
         this.ticketService = ticketService;
         this.seatService = seatService;
         this.scheduleService = scheduleService;
+        this.hallService = hallService;
     }
 
     @Override
@@ -65,8 +68,9 @@ public class ReservationServiceImpl implements ReservationService {
             // SET SEAT
             SeatDTO seatDTO = seatService.findSeatById(seatId).orElseThrow(() -> new NotFoundException("Seat not found"));
 
+            HallDTO hallDTO = hallService.findByNameAndCinemaName(scheduleDTO.getHallName(),scheduleDTO.getCinemaName());
             // Check if seat belongs to hall
-            if(seatDTO.getHallId() != scheduleDTO.getHallId()) throw new BadRequestException("Seat does not belong to Hall");
+            if(seatDTO.getHallId() != hallDTO.getId()) throw new BadRequestException("Seat does not belong to Hall");
             
             ticket.setSeat(seatService.toEntity(seatDTO));
             // SET PRICE
