@@ -7,6 +7,7 @@ import dk.kino.service.ReservationService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.security.Principal;
 import java.util.List;
 
 @RestController
@@ -20,8 +21,8 @@ public class ReservationController {
     }
 
     @PostMapping
-    public ResponseEntity<ReservationResDTO> createReservation(@RequestBody ReservationReqDTO reservationReqDTO){
-        return ResponseEntity.ok().body(reservationService.createReservation(reservationReqDTO));
+    public ResponseEntity<ReservationResDTO> createReservation(@RequestBody ReservationReqDTO reservationReqDTO, Principal principal){
+        return ResponseEntity.ok().body(reservationService.createReservation(reservationReqDTO,principal));
     }
 
     @PostMapping("/prices")

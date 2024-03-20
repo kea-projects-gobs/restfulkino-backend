@@ -10,6 +10,6 @@ import lombok.Getter;
 public class SeatDTO {
     private int id;
     private int seatIndex;
-    private double currentPrice;
+    private String seatPriceName;
     private int hallId;
 }

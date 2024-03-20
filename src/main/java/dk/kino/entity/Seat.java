@@ -14,7 +14,8 @@ public class Seat {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
     private int seatIndex;
-    private double currentPrice;
+    @ManyToOne
+    private SeatPrice seatPrice;
     @ManyToOne
     @JoinColumn(name = "hall_id")
     private Hall hall;
