@@ -102,16 +102,16 @@ public class SetupData implements ApplicationRunner {
         Set<Integer> seatIds1 = new HashSet<>();
         Set<Integer> seatIds2 = new HashSet<>();
         Set<Integer> seatIds3 = new HashSet<>();
-        for (int i=1; i<=10; i++) {
+        for (int i=0; i<=10; i++) {
             if (i<=3) seatIds1.add(i);
             if (i>3 && i<=6) seatIds2.add(i);
             if (i>6) seatIds3.add(i);
         }
 
         List<ReservationReqDTO> reservations = Arrays.asList(
-                ReservationReqDTO.builder().seatIds(seatIds1).scheduleId(schedules.get(0).getId()).build(),
-                ReservationReqDTO.builder().seatIds(seatIds2).scheduleId(schedules.get(0).getId()).build(),
-                ReservationReqDTO.builder().seatIds(seatIds3).scheduleId(schedules.get(0).getId()).build()
+                ReservationReqDTO.builder().seatIndexes(seatIds1).scheduleId(schedules.get(0).getId()).build(),
+                ReservationReqDTO.builder().seatIndexes(seatIds2).scheduleId(schedules.get(0).getId()).build(),
+                ReservationReqDTO.builder().seatIndexes(seatIds3).scheduleId(schedules.get(0).getId()).build()
         );
         reservations.forEach(reservationService::createReservation);
     }

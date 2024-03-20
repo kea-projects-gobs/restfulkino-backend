@@ -29,6 +29,11 @@ public class HallController {
         return ResponseEntity.ok(hall);
     }
 
+    @GetMapping("/{hallName}/cinemas/{cinemaName}")
+    public ResponseEntity<HallDTO> findByNameAndCinemaName(@PathVariable String hallName, @PathVariable String cinemaName) {
+        return ResponseEntity.ok(hallService.findByNameAndCinemaName(hallName,cinemaName));
+    }
+
     @GetMapping("/cinema/{cinemaId}")
     public ResponseEntity<List<HallDTO>> findHallsByCinemaId(@PathVariable int cinemaId) {
         List<HallDTO> halls = hallService.findHallsByCinemaId(cinemaId);

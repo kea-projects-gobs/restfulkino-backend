@@ -2,6 +2,7 @@ package dk.kino.api;
 
 
 import dk.kino.dto.ScheduleDTO;
+import dk.kino.exception.NotFoundException;
 import dk.kino.service.ScheduleService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -25,9 +26,9 @@ public class ScheduleController {
         return ResponseEntity.ok().body(scheduleService.findAll());
     }
 
-    @GetMapping("/{date}")
-    public ResponseEntity<List<ScheduleDTO>> getSchedulesByDate(@PathVariable("date") LocalDate date){
-        return ResponseEntity.ok().body(scheduleService.findByDate(date));
+    @GetMapping("/{id}")
+    public ResponseEntity<ScheduleDTO> getSchedulesById(@PathVariable("id") int id){
+        return ResponseEntity.ok().body(scheduleService.findById(id).orElseThrow(() -> new NotFoundException("Schedule not found")));
     }
 
     @GetMapping("/{date}/movies/{movieId}/cinemas/{cinemasId}")
