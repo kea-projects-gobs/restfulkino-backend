@@ -104,7 +104,7 @@ public class HallServiceImpl implements HallService {
         Set<Seat> seats = new HashSet<>();
         int seatIndex = 0;
 
-        List<SeatPrice> seatPrices = seatPriceService.findAll();
+        List<SeatPrice> seatPrices = seatPriceService.findAllSeatPrices();
 
         SeatPrice economyPrice = seatPrices.stream()
                 .filter(seatPrice -> "economy".equalsIgnoreCase(seatPrice.getName()))
