@@ -70,8 +70,8 @@ public class SetupData implements ApplicationRunner {
         moviePrices.forEach(moviePriceService::createMoviePrice);
 
         List<ReservationPrice> reservationPrices = Arrays.asList(
-                new ReservationPrice("fee",0.07,"percent"),
-                new ReservationPrice("discount",0.05,"percent")
+                new ReservationPrice("fee",0.07,"percentInDecimal"),
+                new ReservationPrice("discount",0.05,"percentInDecimal")
         );
         reservationPrices.forEach(reservationPriceService::createReservationPrice);
 
