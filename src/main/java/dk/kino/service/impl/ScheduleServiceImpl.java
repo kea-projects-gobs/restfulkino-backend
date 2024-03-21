@@ -8,7 +8,7 @@ import dk.kino.entity.Schedule;
 import dk.kino.repository.ScheduleRepository;
 import dk.kino.service.MovieService;
 import dk.kino.service.ScheduleService;
-import dk.kino.service.hall.HallService;
+import dk.kino.service.HallService;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;

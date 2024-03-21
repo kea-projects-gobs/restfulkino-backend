@@ -1,7 +1,7 @@
 package dk.kino.api;
 
 import dk.kino.dto.CinemaDTO;
-import dk.kino.service.cinema.CinemaService;
+import dk.kino.service.CinemaService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 

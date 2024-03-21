@@ -1,4 +1,4 @@
-package dk.kino.service.cinema;
+package dk.kino.service.impl;
 
 import dk.kino.dto.CinemaDTO;
 import dk.kino.dto.HallDTO;
@@ -7,7 +7,8 @@ import dk.kino.entity.Hall;
 import dk.kino.entity.Schedule;
 import dk.kino.repository.CinemaRepository;
 import dk.kino.repository.ScheduleRepository;
-import dk.kino.service.hall.HallService;
+import dk.kino.service.CinemaService;
+import dk.kino.service.HallService;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -30,18 +31,20 @@ public class CinemaServiceImpl implements CinemaService {
 
     @Override
     public List<CinemaDTO> findAll() {
-        return cinemaRepository.findAll().stream().map(this::convertToDTO).collect(Collectors.toList());
+        return cinemaRepository.findAllByIsActiveTrue().stream().map(this::convertToDTO).collect(Collectors.toList());
     }
 
     @Override
     public CinemaDTO findById(int id) {
-        Optional<Cinema> cinema = cinemaRepository.findById(id);
-        return cinema.map(this::convertToDTO).orElse(null);
+        Optional<Cinema> cinema = cinemaRepository.findById(id)
+        .filter(Cinema::isActive);
+        return cinema.map(this::convertToDTO).orElseThrow(() -> new RuntimeException("Cinema not found"));
     }
 
     @Override
     public CinemaDTO createCinema(CinemaDTO cinemaDTO) {
         Cinema cinema = convertToEntity(cinemaDTO);
+        cinema.setActive(true);
         Cinema savedCinema = cinemaRepository.save(cinema);
         return convertToDTO(savedCinema);
     }
@@ -68,7 +71,17 @@ public class CinemaServiceImpl implements CinemaService {
 
     @Override
     public void deleteCinema(int id) {
-        cinemaRepository.deleteById(id);
+        Cinema cinema = cinemaRepository.findById(id).orElseThrow(() -> new RuntimeException("Cinema not found"));
+        cinema.setActive(false);
+        cinemaRepository.save(cinema);
+
+        // Soft delete all related halls
+        List<Hall> halls = cinema.getHalls();
+        if (halls != null){
+            halls.forEach(hall -> {
+                hallService.deleteHall(hall.getId());
+            });
+        }
     }
 
     @Override
@@ -82,6 +95,7 @@ public class CinemaServiceImpl implements CinemaService {
         dto.setPhone(cinema.getPhone());
         dto.setEmail(cinema.getEmail());
         dto.setImageUrl(cinema.getImageUrl());
+        dto.setActive(cinema.isActive());
         // convert halls to HallDTOs and set them
         if (cinema.getHalls() != null){
             List<HallDTO> hallDTOs = cinema.getHalls().stream().map(hall -> (HallDTO) hallService.convertHallToDTO(hall)).collect(Collectors.toList());
@@ -101,6 +115,7 @@ public class CinemaServiceImpl implements CinemaService {
         cinema.setPhone(cinemaDTO.getPhone());
         cinema.setEmail(cinemaDTO.getEmail());
         cinema.setImageUrl(cinemaDTO.getImageUrl());
+        cinema.setActive(cinemaDTO.isActive());
         return cinema;
     }
 

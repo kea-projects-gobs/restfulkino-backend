@@ -1,4 +1,4 @@
-package dk.kino.service.hall;
+package dk.kino.service.impl;
 
 import dk.kino.dto.HallDTO;
 import dk.kino.dto.SeatDTO;
@@ -10,6 +10,7 @@ import dk.kino.repository.CinemaRepository;
 import dk.kino.repository.HallRepository;
 import dk.kino.service.SeatPriceService;
 import dk.kino.service.SeatService;
+import dk.kino.service.HallService;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -33,18 +34,19 @@ public class HallServiceImpl implements HallService {
 
     @Override
     public List<HallDTO> findAll() {
-        return hallRepository.findAll().stream().map(this::convertHallToDTO).collect(Collectors.toList());
+        return hallRepository.findAllByIsActiveTrue().stream().map(this::convertHallToDTO).collect(Collectors.toList());
     }
 
     @Override
     public HallDTO findById(int id) {
-        Optional<Hall> hall = hallRepository.findById(id);
-        return hall.map(this::convertHallToDTO).orElse(null);
+        Optional<Hall> hall = hallRepository.findById(id)
+        .filter(Hall::isActive);
+        return hall.map(this::convertHallToDTO).orElseThrow(() -> new RuntimeException("Hall not found"));
     }
 
     @Override
     public HallDTO findByNameAndCinemaName(String hallName, String cinemaName) {
-        Optional<Hall> hall = hallRepository.findByNameAndCinemaName(hallName,cinemaName);
+        Optional<Hall> hall = hallRepository.findByNameAndCinemaNameAndIsActiveTrue(hallName,cinemaName);
         return hall.map(this::convertHallToDTO).orElse(null);
     }
 
@@ -52,6 +54,7 @@ public class HallServiceImpl implements HallService {
     @Override
     public HallDTO createHall(HallDTO hallDTO) {
         Hall hall = convertToEntity(hallDTO);
+        hall.setActive(true);
         cinemaRepository.findById(hallDTO.getCinemaId()).ifPresent(hall::setCinema);
         Hall savedHall = hallRepository.save(hall);
         // CREATE SEATS
@@ -95,7 +98,16 @@ public class HallServiceImpl implements HallService {
 
     @Override
     public void deleteHall(int id) {
-        hallRepository.deleteById(id);
+        Hall hall = hallRepository.findById(id).orElseThrow(() -> new RuntimeException("Hall not found"));
+        hall.setActive(false);
+        hallRepository.save(hall);
+
+        // Soft delete all related seats
+        Set<Seat> seats = hall.getSeats();
+        if (seats != null){
+            Set<SeatDTO> seatDTOs = seats.stream().map(seatService::toDto).collect(Collectors.toSet());
+            seatService.deleteSeats(seatDTOs);
+        }
     }
 
     private Set<Seat> createSeats(Hall hall) {
@@ -147,6 +159,7 @@ public class HallServiceImpl implements HallService {
         dto.setNoOfRows(hall.getNoOfRows());
         dto.setNoOfColumns(hall.getNoOfColumns());
         dto.setImageUrl(hall.getImageUrl());
+        dto.setActive(hall.isActive());
         if (hall.getCinema() != null){
             dto.setCinemaId(hall.getCinema().getId());
         }
@@ -161,13 +174,14 @@ public class HallServiceImpl implements HallService {
         hall.setNoOfRows(hallDTO.getNoOfRows());
         hall.setNoOfColumns(hallDTO.getNoOfColumns());
         hall.setImageUrl(hallDTO.getImageUrl());
+        hall.setActive(hallDTO.isActive());
         hall.setCinema(cinemaRepository.findById(hallDTO.getCinemaId()).orElse(null));
         return hall;
     }
 
     @Override
     public List<HallDTO> findHallsByCinemaId(int cinemaId) {
-        List<Hall> halls = hallRepository.findByCinemaId(cinemaId);
+        List<Hall> halls = hallRepository.findByCinemaIdAndIsActiveTrue(cinemaId);
         return halls.stream().map(this::convertHallToDTO).collect(Collectors.toList());
     }
 }

@@ -22,22 +22,25 @@ public class MovieServiceImpl implements MovieService {
 
     @Override
     public MovieDTO create(MovieDTO movieDTO) {
+        movieDTO.setActive(true);
         return toDto(movieRepository.save(toEntity(movieDTO)));
     }
 
     @Override
     public Optional<MovieDTO> findById(int id) {
-        return movieRepository.findById(id).map(this::toDto);
+        return movieRepository.findById(id)
+                .filter(Movie::isActive)
+                .map(this::toDto);
     }
 
     @Override
     public Optional<MovieDTO> findByTitle(String title) {
-        return movieRepository.findByTitle(title).map(this::toDto);
+        return movieRepository.findByTitleAndIsActiveTrue(title).map(this::toDto);
     }
 
     @Override
     public List<MovieDTO> findAll() {
-        return movieRepository.findAll().stream().map(this::toDto).collect(Collectors.toList());
+        return movieRepository.findAllByIsActiveTrue().stream().map(this::toDto).collect(Collectors.toList());
     }
 
     @Override
@@ -64,7 +67,8 @@ public class MovieServiceImpl implements MovieService {
     public void delete(int id) {
         // TODO: Add proper exception
         Movie movie = movieRepository.findById(id).orElseThrow(() -> new RuntimeException("Movie not found."));
-        movieRepository.delete(movie);
+        movie.setActive(false);
+        movieRepository.save(movie);
     }
 
     @Override
@@ -80,6 +84,7 @@ public class MovieServiceImpl implements MovieService {
                 .genre(movie.getGenre())
                 .director(movie.getDirector())
                 .cast(movie.getCast())
+                .isActive(movie.isActive())
                 .build();
     }
 
@@ -96,6 +101,7 @@ public class MovieServiceImpl implements MovieService {
                 .genre(movieDTO.getGenre())
                 .director(movieDTO.getDirector())
                 .cast(movieDTO.getCast())
+                .isActive(movieDTO.isActive())
                 .build();
     }
 }
