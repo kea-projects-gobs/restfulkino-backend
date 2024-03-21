@@ -100,6 +100,13 @@ public class HallServiceImpl implements HallService {
         Hall hall = hallRepository.findById(id).orElseThrow(() -> new RuntimeException("Hall not found"));
         hall.setActive(false);
         hallRepository.save(hall);
+
+        // Soft delete all related seats
+        Set<Seat> seats = hall.getSeats();
+        if (seats != null){
+            Set<SeatDTO> seatDTOs = seats.stream().map(seatService::toDto).collect(Collectors.toSet());
+            seatService.deleteSeats(seatDTOs);
+        }
     }
 
     private Set<Seat> createSeats(Hall hall) {
