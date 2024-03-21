@@ -1,7 +1,7 @@
 package dk.kino.api;
 
 import dk.kino.dto.HallDTO;
-import dk.kino.service.hall.HallService;
+import dk.kino.service.HallService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 

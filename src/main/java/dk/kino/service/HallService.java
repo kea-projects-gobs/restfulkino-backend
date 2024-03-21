@@ -1,4 +1,4 @@
-package dk.kino.service.hall;
+package dk.kino.service;
 
 import dk.kino.dto.HallDTO;
 import dk.kino.entity.Hall;

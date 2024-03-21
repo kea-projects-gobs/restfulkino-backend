@@ -1,4 +1,4 @@
-package dk.kino.service.hall;
+package dk.kino.service.impl;
 
 import dk.kino.dto.HallDTO;
 import dk.kino.dto.SeatDTO;
@@ -10,6 +10,7 @@ import dk.kino.repository.CinemaRepository;
 import dk.kino.repository.HallRepository;
 import dk.kino.service.SeatPriceService;
 import dk.kino.service.SeatService;
+import dk.kino.service.HallService;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 

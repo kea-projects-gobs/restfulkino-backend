@@ -6,7 +6,7 @@ import dk.kino.exception.BadRequestException;
 import dk.kino.exception.NotFoundException;
 import dk.kino.repository.ReservationRepository;
 import dk.kino.service.*;
-import dk.kino.service.hall.HallService;
+import dk.kino.service.HallService;
 import dk.security.entity.UserWithRoles;
 import dk.security.service.UserWithRolesService;
 import jakarta.transaction.Transactional;

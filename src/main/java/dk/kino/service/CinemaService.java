@@ -1,4 +1,4 @@
-package dk.kino.service.cinema;
+package dk.kino.service;
 
 import dk.kino.dto.CinemaDTO;
 import dk.kino.entity.Cinema;
