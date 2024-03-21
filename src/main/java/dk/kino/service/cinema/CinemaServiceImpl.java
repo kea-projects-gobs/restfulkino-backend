@@ -30,7 +30,7 @@ public class CinemaServiceImpl implements CinemaService {
 
     @Override
     public List<CinemaDTO> findAll() {
-        return cinemaRepository.findAll().stream().map(this::convertToDTO).collect(Collectors.toList());
+        return cinemaRepository.findAllByIsActiveTrue().stream().map(this::convertToDTO).collect(Collectors.toList());
     }
 
     @Override
@@ -42,6 +42,7 @@ public class CinemaServiceImpl implements CinemaService {
     @Override
     public CinemaDTO createCinema(CinemaDTO cinemaDTO) {
         Cinema cinema = convertToEntity(cinemaDTO);
+        cinema.setActive(true);
         Cinema savedCinema = cinemaRepository.save(cinema);
         return convertToDTO(savedCinema);
     }
@@ -71,6 +72,14 @@ public class CinemaServiceImpl implements CinemaService {
         Cinema cinema = cinemaRepository.findById(id).orElseThrow(() -> new RuntimeException("Cinema not found"));
         cinema.setActive(false);
         cinemaRepository.save(cinema);
+
+        // Soft delete all related halls
+        List<Hall> halls = cinema.getHalls();
+        if (halls != null){
+            halls.forEach(hall -> {
+                hallService.deleteHall(hall.getId());
+            });
+        }
     }
 
     @Override
@@ -84,6 +93,7 @@ public class CinemaServiceImpl implements CinemaService {
         dto.setPhone(cinema.getPhone());
         dto.setEmail(cinema.getEmail());
         dto.setImageUrl(cinema.getImageUrl());
+        dto.setActive(cinema.isActive());
         // convert halls to HallDTOs and set them
         if (cinema.getHalls() != null){
             List<HallDTO> hallDTOs = cinema.getHalls().stream().map(hall -> (HallDTO) hallService.convertHallToDTO(hall)).collect(Collectors.toList());
@@ -103,6 +113,7 @@ public class CinemaServiceImpl implements CinemaService {
         cinema.setPhone(cinemaDTO.getPhone());
         cinema.setEmail(cinemaDTO.getEmail());
         cinema.setImageUrl(cinemaDTO.getImageUrl());
+        cinema.setActive(cinemaDTO.isActive());
         return cinema;
     }
 

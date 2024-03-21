@@ -33,7 +33,7 @@ public class Cinema {
     private String imageUrl;
     private boolean isActive;
 
-    @OneToMany(mappedBy = "cinema", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "cinema")
     private List<Hall> halls;
 
     public Cinema(String name, String city, String street, String description, String phone, String email, String imageUrl) {
