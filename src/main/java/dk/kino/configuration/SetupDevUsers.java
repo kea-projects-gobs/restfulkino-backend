@@ -56,18 +56,18 @@ public class SetupDevUsers implements ApplicationRunner {
         System.out.println("**** ** ON YOUR REMOTE DATABASE                 ******************************");
         System.out.println();
         System.out.println("******************************************************************************");
-        UserWithRoles user1 = new UserWithRoles("user1", pwEncoder.encode(passwordUsedByAll), "user1@a.dk");
-        UserWithRoles user2 = new UserWithRoles("user2", pwEncoder.encode(passwordUsedByAll), "user2@a.dk");
-        UserWithRoles user3 = new UserWithRoles("user3", pwEncoder.encode(passwordUsedByAll), "user3@a.dk");
-        UserWithRoles user4 = new UserWithRoles("user4", pwEncoder.encode(passwordUsedByAll), "user4@a.dk");
-        user1.addRole(roleUser);
-        user1.addRole(roleAdmin);
-        user2.addRole(roleUser);
-        user3.addRole(roleAdmin);
-        userWithRolesRepository.save(user1);
-        userWithRolesRepository.save(user2);
-        userWithRolesRepository.save(user3);
-        userWithRolesRepository.save(user4);
+        UserWithRoles admin = new UserWithRoles("admin", pwEncoder.encode(passwordUsedByAll), "admin@a.dk");
+        UserWithRoles user = new UserWithRoles("user", pwEncoder.encode(passwordUsedByAll), "user@a.dk");
+        UserWithRoles useradmin = new UserWithRoles("useradmin", pwEncoder.encode(passwordUsedByAll), "useradmin@a.dk");
+
+        admin.addRole(roleAdmin);
+        user.addRole(roleUser);
+        useradmin.addRole(roleAdmin);
+        useradmin.addRole(roleUser);
+        userWithRolesRepository.save(admin);
+        userWithRolesRepository.save(user);
+        userWithRolesRepository.save(useradmin);
+
     }
 
     private void setupEmployee(){
