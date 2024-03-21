@@ -2,12 +2,21 @@ package dk.kino.api;
 
 import dk.kino.dto.CinemaDTO;
 import dk.kino.service.CinemaService;
+import io.swagger.v3.oas.annotations.OpenAPIDefinition;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.info.Info;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
+@OpenAPIDefinition(
+        info = @Info(
+                title="Cinema API",
+                version = "1.0",
+                description = "API for managing cinemas."
+        )
+)
 
 @RestController
 @RequestMapping("/api/cinemas")
