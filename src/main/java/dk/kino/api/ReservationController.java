@@ -1,5 +1,6 @@
 package dk.kino.api;
 
+import dk.kino.dto.ReservationPriceCalcDTO;
 import dk.kino.dto.ReservationReqDTO;
 import dk.kino.dto.ReservationResDTO;
 import dk.kino.dto.SeatDTO;
@@ -7,6 +8,7 @@ import dk.kino.service.ReservationService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.security.Principal;
 import java.util.List;
 
 @RestController
@@ -20,12 +22,12 @@ public class ReservationController {
     }
 
     @PostMapping
-    public ResponseEntity<ReservationResDTO> createReservation(@RequestBody ReservationReqDTO reservationReqDTO){
-        return ResponseEntity.ok().body(reservationService.createReservation(reservationReqDTO));
+    public ResponseEntity<ReservationResDTO> createReservation(@RequestBody ReservationReqDTO reservationReqDTO, Principal principal){
+        return ResponseEntity.ok().body(reservationService.createReservation(reservationReqDTO,principal));
     }
 
     @PostMapping("/prices")
-    public ResponseEntity<ReservationResDTO> calculatePrice(@RequestBody ReservationReqDTO reservationReqDTO){
+    public ResponseEntity<ReservationPriceCalcDTO> calculatePrice(@RequestBody ReservationReqDTO reservationReqDTO){
         return ResponseEntity.ok().body(reservationService.calculatePrice(reservationReqDTO));
     }
 

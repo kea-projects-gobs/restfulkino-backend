@@ -7,9 +7,8 @@ import lombok.Getter;
 @Getter
 @AllArgsConstructor
 @Builder
-public class SeatDTO {
-    private int id;
+public class TicketPriceCalcDTO {
+    private int seatId;
     private int seatIndex;
-    private String seatPriceName;
-    private int hallId;
+    private double price;
 }

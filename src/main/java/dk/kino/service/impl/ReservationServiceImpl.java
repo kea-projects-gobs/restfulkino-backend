@@ -1,21 +1,18 @@
 package dk.kino.service.impl;
 
 import dk.kino.dto.*;
-import dk.kino.entity.Reservation;
-import dk.kino.entity.Schedule;
-import dk.kino.entity.Seat;
-import dk.kino.entity.Ticket;
+import dk.kino.entity.*;
 import dk.kino.exception.BadRequestException;
 import dk.kino.exception.NotFoundException;
 import dk.kino.repository.ReservationRepository;
-import dk.kino.service.ReservationService;
-import dk.kino.service.ScheduleService;
-import dk.kino.service.SeatService;
-import dk.kino.service.TicketService;
+import dk.kino.service.*;
 import dk.kino.service.hall.HallService;
+import dk.security.entity.UserWithRoles;
+import dk.security.service.UserWithRolesService;
 import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Service;
 
+import java.security.Principal;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
@@ -30,22 +27,71 @@ public class ReservationServiceImpl implements ReservationService {
     private final SeatService seatService;
     private final ScheduleService scheduleService;
     private final HallService hallService;
+    private final SeatPriceService seatPriceService;
+    private final MoviePriceService moviePriceService;
+    private final ReservationPriceService reservationPriceService;
+    private final UserWithRolesService userWithRolesService;
 
-    public ReservationServiceImpl(ReservationRepository reservationRepository,TicketService ticketService,SeatService seatService,ScheduleService scheduleService,HallService hallService) {
+    public ReservationServiceImpl(ReservationRepository reservationRepository,TicketService ticketService,SeatService seatService,
+                                  ScheduleService scheduleService,HallService hallService,SeatPriceService seatPriceService,
+                                  MoviePriceService moviePriceService,ReservationPriceService reservationPriceService,
+                                  UserWithRolesService userWithRolesService) {
         this.reservationRepository = reservationRepository;
         this.ticketService = ticketService;
         this.seatService = seatService;
         this.scheduleService = scheduleService;
         this.hallService = hallService;
+        this.seatPriceService = seatPriceService;
+        this.moviePriceService = moviePriceService;
+        this.reservationPriceService = reservationPriceService;
+        this.userWithRolesService = userWithRolesService;
+    }
+
+    private List<MoviePrice> getMoviePrices() {
+        return moviePriceService.findAllMoviePrices();
+    }
+
+    private List<ReservationPrice> getReservationPrices() {
+        return reservationPriceService.findAllReservationPrices();
+    }
+
+    private List<SeatPrice> getSeatPrices() {
+        return seatPriceService.findAllSeatPrices();
+    }
+
+    private MoviePrice findMoviePriceByNameFromList(List<MoviePrice> moviePrices, String name) {
+        return moviePrices.stream()
+                .filter(seatPrice -> name.equalsIgnoreCase(seatPrice.getName()))
+                .findFirst()
+                .orElse(null);
+    }
+
+    private ReservationPrice findReservationPriceByNameFromList(List<ReservationPrice> reservationPrices, String name) {
+        return reservationPrices.stream()
+                .filter(seatPrice -> name.equalsIgnoreCase(seatPrice.getName()))
+                .findFirst()
+                .orElse(null);
+    }
+
+    private SeatPrice findSeatPriceByNameFromList(List<SeatPrice> seatPrices, String name) {
+        return seatPrices.stream()
+                .filter(seatPrice -> name.equalsIgnoreCase(seatPrice.getName()))
+                .findFirst()
+                .orElse(null);
     }
 
     @Override
-    public ReservationResDTO calculatePrice(ReservationReqDTO reservationReqDTO) {
-        // USE PRICE SERVICE
-        double PRICE_LONG_MOVIE = 20.0;
-        double PRICE_3D = 10.0;
-        double FEE = 0.07;
-        double DISCOUNT = 0.05;
+    public ReservationPriceCalcDTO calculatePrice(ReservationReqDTO reservationReqDTO) {
+        // GET PRICES
+        List<SeatPrice> seatPrices = getSeatPrices();
+        List<MoviePrice> moviePrices = getMoviePrices();
+        List<ReservationPrice> reservationPrices = getReservationPrices();
+
+        double PRICE_LONG_MOVIE = findMoviePriceByNameFromList(moviePrices,"longMovie").getAmount();
+        double PRICE_3D = findMoviePriceByNameFromList(moviePrices,"threeD").getAmount();
+        double FEE = findReservationPriceByNameFromList(reservationPrices,"fee").getAmount();
+        double DISCOUNT = findReservationPriceByNameFromList(reservationPrices,"discount").getAmount();
+
 
         double TICKET_PRICE_ADJUSTMENT = 0;
 
@@ -80,12 +126,12 @@ public class ReservationServiceImpl implements ReservationService {
             // SET SEAT
             SeatDTO seatDTO = seatService.findSeatById(seatId).orElseThrow(() -> new NotFoundException("Seat not found"));
 
-//            // Check if seat belongs to hall
-//            if(seatDTO.getHallId() != hallDTO.getId()) throw new BadRequestException("Seat does not belong to Hall");
-
             ticket.setSeat(seatService.toEntity(seatDTO));
+
+            double seatPrice = findSeatPriceByNameFromList(seatPrices,seatDTO.getSeatPriceName()).getAmount();
+
             // SET PRICE
-            double ticketPrice = seatDTO.getCurrentPrice()+TICKET_PRICE_ADJUSTMENT;
+            double ticketPrice = seatPrice+TICKET_PRICE_ADJUSTMENT;
             ticket.setPrice(ticketPrice);
             subTotal+=ticketPrice;
         }
@@ -101,17 +147,21 @@ public class ReservationServiceImpl implements ReservationService {
         }
 //        ticketService.createTickets(reservation.getTickets().stream().map(ticketService::toDto).collect(Collectors.toList()));
 
-        return toDto(reservation);
+        return toReservationPriceCalcDTO(reservation);
     }
 
     @Override
     @Transactional
-    public ReservationResDTO createReservation(ReservationReqDTO reservationReqDTO) {
-        // USE PRICE SERVICE
-        double PRICE_LONG_MOVIE = 20.0;
-        double PRICE_3D = 10.0;
-        double FEE = 0.07;
-        double DISCOUNT = 0.05;
+    public ReservationResDTO createReservation(ReservationReqDTO reservationReqDTO, Principal principal) {
+        // GET PRICES
+        List<SeatPrice> seatPrices = getSeatPrices();
+        List<MoviePrice> moviePrices = getMoviePrices();
+        List<ReservationPrice> reservationPrices = getReservationPrices();
+
+        double PRICE_LONG_MOVIE = findMoviePriceByNameFromList(moviePrices,"longMovie").getAmount();
+        double PRICE_3D = findMoviePriceByNameFromList(moviePrices,"threeD").getAmount();
+        double FEE = findReservationPriceByNameFromList(reservationPrices,"fee").getAmount();
+        double DISCOUNT = findReservationPriceByNameFromList(reservationPrices,"discount").getAmount();
 
         double TICKET_PRICE_ADJUSTMENT = 0;
 
@@ -146,12 +196,12 @@ public class ReservationServiceImpl implements ReservationService {
             // SET SEAT
             SeatDTO seatDTO = seatService.findSeatById(seatId).orElseThrow(() -> new NotFoundException("Seat not found"));
 
-//            // Check if seat belongs to hall
-//            if(seatDTO.getHallId() != hallDTO.getId()) throw new BadRequestException("Seat does not belong to Hall");
-            
             ticket.setSeat(seatService.toEntity(seatDTO));
+
+            double seatPrice = findSeatPriceByNameFromList(seatPrices,seatDTO.getSeatPriceName()).getAmount();
+
             // SET PRICE
-            double ticketPrice = seatDTO.getCurrentPrice()+TICKET_PRICE_ADJUSTMENT;
+            double ticketPrice = seatPrice+TICKET_PRICE_ADJUSTMENT;
             ticket.setPrice(ticketPrice);
             subTotal+=ticketPrice;
         }
@@ -160,6 +210,14 @@ public class ReservationServiceImpl implements ReservationService {
         if(reservation.getTickets().size() > 10) reservation.setFeeOrDiscount(roundToTwoDecimalPlaces(-subTotal*DISCOUNT));
 
         reservation.setReservationDate(LocalDate.now());
+
+        // ADD user
+
+        String currentUserName = principal.getName();
+        userWithRolesService.getUserWithRoles(currentUserName);
+        UserWithRoles userWithRoles = new UserWithRoles();
+        userWithRoles.setUsername(currentUserName);
+        reservation.setUser(userWithRoles);
 
         Reservation savedReservation = reservationRepository.save(reservation);
         for (Ticket ticket : reservation.getTickets()) {
@@ -215,6 +273,22 @@ public class ReservationServiceImpl implements ReservationService {
         return Reservation.builder()
                 .schedule(Schedule.builder().id(reservationReqDTO.getScheduleId()).build())
                 .tickets(tickets)
+                .build();
+    }
+
+    private ReservationPriceCalcDTO toReservationPriceCalcDTO(Reservation reservation) {
+        return ReservationPriceCalcDTO.builder()
+                .scheduleId(reservation.getId())
+                .feeOrDiscount(reservation.getFeeOrDiscount())
+                .tickets(reservation.getTickets().stream().map(this::toTicketPriceCalcDTO).collect(Collectors.toSet()))
+                .build();
+    }
+
+    private TicketPriceCalcDTO toTicketPriceCalcDTO(Ticket ticket) {
+        return TicketPriceCalcDTO.builder()
+                .seatId(ticket.getSeat().getId())
+                .seatIndex(ticket.getSeat().getSeatIndex())
+                .price(ticket.getPrice())
                 .build();
     }
 }
