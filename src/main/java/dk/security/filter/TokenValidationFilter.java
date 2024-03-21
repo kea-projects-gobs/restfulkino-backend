@@ -28,7 +28,6 @@ public class TokenValidationFilter extends OncePerRequestFilter {
      *     <li>If a valid token is found, the request is allowed to proceed to the next filter in the chain.</li>
      *     <li>If the token is missing, invalid, or expired, the request is rejected with a 401 Unauthorized status code.</li>
      * </ul>
-     * </p>
      *
      * @param request     The client's request.
      * @param response    The server's response.
