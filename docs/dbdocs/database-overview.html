@@ -9,10 +9,6 @@
             font-family: Arial, sans-serif;
             margin: 20px;
         }
-        img {
-            max-width: 50%;
-            height: auto;
-        }
     </style>
     <script>
         function showEntity(entityId) {
@@ -35,7 +31,7 @@
     <p>Denne side giver et overblik over databasen og dens tabeller.</p>
     
     <h2>ER Diagram</h2>
-    <img src="ER-diagram/restfulkino_db.png" alt="ER Diagram of the Database" title="Database ER Diagram">
+    <p>ER Diagram kan ses <a href="https://imgur.com/a/n5wmFff" target="_blank">her</a>.</p>
 
     <h2>Tabeller</h2>
     <p>Vælg en entitet for at se detaljer:</p>
@@ -153,7 +149,6 @@
             <li>amount: double</li>
             <li>unit: string</li>
         </ul>
-        <p>ReservationPrice repræsenterer prisen for en reservation.</p>
     </div>
     <div id="schedule" class="entity-description">
         <h3>Schedule</h3>
@@ -168,7 +163,6 @@
             <li>movie: Movie (relation)</li>
             <li>hall: Hall (relation)</li>
         </ul>
-        <p>Schedule repræsenterer en specifik filmvisning i en biograf.</p>
         <p>Relationer:</p>
         <ul>
             <li><strong>Movie:</strong> many-to-one - En visning er knyttet til en specifik film.</li>
@@ -185,7 +179,6 @@
             <li>hall: Hall (relation)</li>
             <li>isActive: boolean</li>
         </ul>
-        <p>Seat repræsenterer et individuelt sæde i en biografsal.</p>
         <p>Relationer:</p>
         <ul>
             <li><strong>SeatPrice:</strong> many-to-one - Et sæde kan have en specifik pris, der er defineret af en SeatPrice.</li>
@@ -200,7 +193,6 @@
             <li>amount: double</li>
             <li>unit: string</li>
         </ul>
-        <p>SeatPrice repræsenterer prisen for et sæde</p>
     </div>
     <div id="ticket" class="entity-description">
         <h3>Ticket</h3>
@@ -211,7 +203,6 @@
             <li>price: double</li>
             <li>reservation: Reservation (relation)</li>
         </ul>
-        <p>Ticket repræsenterer en billet til en filmvisning.</p>
         <p>Relationer:</p>
         <ul>
             <li><strong>Seat:</strong> many-to-one - En billet er knyttet til et specifikt sæde.</li>
