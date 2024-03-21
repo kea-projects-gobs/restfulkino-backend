@@ -35,8 +35,9 @@ public class CinemaServiceImpl implements CinemaService {
 
     @Override
     public CinemaDTO findById(int id) {
-        Optional<Cinema> cinema = cinemaRepository.findById(id);
-        return cinema.map(this::convertToDTO).orElse(null);
+        Optional<Cinema> cinema = cinemaRepository.findById(id)
+        .filter(Cinema::isActive);
+        return cinema.map(this::convertToDTO).orElseThrow(() -> new RuntimeException("Cinema not found"));
     }
 
     @Override

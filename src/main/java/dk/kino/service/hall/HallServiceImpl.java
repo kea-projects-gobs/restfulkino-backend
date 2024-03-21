@@ -38,8 +38,9 @@ public class HallServiceImpl implements HallService {
 
     @Override
     public HallDTO findById(int id) {
-        Optional<Hall> hall = hallRepository.findById(id);
-        return hall.map(this::convertHallToDTO).orElse(null);
+        Optional<Hall> hall = hallRepository.findById(id)
+        .filter(Hall::isActive);
+        return hall.map(this::convertHallToDTO).orElseThrow(() -> new RuntimeException("Hall not found"));
     }
 
     @Override

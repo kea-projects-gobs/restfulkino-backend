@@ -28,7 +28,9 @@ public class MovieServiceImpl implements MovieService {
 
     @Override
     public Optional<MovieDTO> findById(int id) {
-        return movieRepository.findById(id).map(this::toDto);
+        return movieRepository.findById(id)
+                .filter(Movie::isActive)
+                .map(this::toDto);
     }
 
     @Override
