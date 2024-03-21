@@ -17,6 +17,23 @@ public class TokenValidationFilter extends OncePerRequestFilter {
         this.tokenStore = tokenStore;
     }
 
+
+    /**
+     * Validates the authentication token provided in the Authorization header of incoming HTTP requests.
+     * <p>
+     * This method intercepts each request to the server and performs the following checks:
+     * <ul>
+     *     <li>If the request targets the logout endpoint ("/api/auth/logout"), the method allows the request to proceed without token validation.</li>
+     *     <li>For all other endpoints, the method checks for the presence of a "Bearer" token in the Authorization header.</li>
+     *     <li>If a valid token is found, the request is allowed to proceed to the next filter in the chain.</li>
+     *     <li>If the token is missing, invalid, or expired, the request is rejected with a 401 Unauthorized status code.</li>
+     * </ul>
+     * </p>
+     *
+     * @param request     The client's request.
+     * @param response    The server's response.
+     * @param filterChain The {@link FilterChain} object that allows the request to proceed to the next filter or resource.
+     */
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
             throws ServletException, IOException {
