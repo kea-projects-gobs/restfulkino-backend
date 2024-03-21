@@ -10,19 +10,216 @@
             margin: 20px;
         }
         img {
-            max-width: 100%;
+            max-width: 50%;
             height: auto;
         }
     </style>
+    <script>
+        function showEntity(entityId) {
+            var descriptions = document.getElementsByClassName('entity-description');
+            for (var i = 0; i < descriptions.length; i++) {
+                descriptions[i].style.display = 'none';
+            }
+            var selectedEntity = document.getElementById(entityId);
+            if (selectedEntity) {
+                selectedEntity.style.display = 'block';
+            }
+        }
+        document.addEventListener('DOMContentLoaded', function() {
+            showEntity('cinema');
+        });
+    </script>
 </head>
 <body>
-    <h1>Database Overview</h1>
-    <p>This page provides a brief overview of the database schema used in our project.</p>
+    <h1>Database</h1>
+    <p>Denne side giver et overblik over databasen og dens tabeller.</p>
     
-    <h2>Entity-Relationship Diagram</h2>
-    <p>The following ER diagram illustrates the relationships between the various tables in our database:</p>
-    <img src="path/to/your/er-diagram.png" alt="ER Diagram of the Database" title="Database ER Diagram">
+    <h2>ER Diagram</h2>
+    <img src="ER-diagram/restfulkino_db.png" alt="ER Diagram of the Database" title="Database ER Diagram">
+
+    <h2>Tabeller</h2>
+    <p>Vælg en entitet for at se detaljer:</p>
+    <ul>
+        <li><a href="#!" onclick="showEntity('cinema')">Cinema</a></li>
+        <li><a href="#!" onclick="showEntity('hall')">Hall</a></li>
+        <li><a href="#!" onclick="showEntity('movie')">Movie</a></li>
+        <li><a href="#!" onclick="showEntity('moviePrice')">MoviePrice</a></li>
+        <li><a href="#!" onclick="showEntity('reservation')">Reservation</a></li>
+        <li><a href="#!" onclick="showEntity('reservationPrice')">ReservationPrice</a></li>
+        <li><a href="#!" onclick="showEntity('schedule')">Schedule</a></li>
+        <li><a href="#!" onclick="showEntity('seat')">Seat</a></li>
+        <li><a href="#!" onclick="showEntity('seatPrice')">SeatPrice</a></li>
+        <li><a href="#!" onclick="showEntity('ticket')">Ticket</a></li>
+    </ul>
     
-    <!-- You can add more sections here, such as a description of each table or key relationships. -->
+    
+    <div id="cinema" class="entity-description">
+        <h3>Cinema</h3>
+        <p>Attributter:</p>
+        <ul>
+            <li>id: int</li>
+            <li>name: string</li>
+            <li>city: string</li>
+            <li>street: string</li>
+            <li>description: string</li>
+            <li>phone: string</li>
+            <li>email: string</li>
+            <li>imageUrl: string</li>
+            <li>isActive: boolean</li>
+            <li>halls: Hall (relation)</li>
+        </ul>
+        <p>Relationer:</p>
+        <ul>
+            <li><strong>Hall:</strong> one-to-many - En biograf kan have flere sale</li>
+        </ul>
+    </div>
+
+    <div id="hall" class="entity-description">
+        <h3>Hall</h3>
+        <p>Attributter:</p>
+        <ul>
+            <li>id: int</li>
+            <li>name: string</li>
+            <li>noOfRows: int</li>
+            <li>noOfColumns: int</li>
+            <li>imageUrl: string</li>
+            <li>isActive: boolean</li>
+            <li>cinemas: Cinema (relation)</li>
+            <li>schedules: Schedule (relation)</li>
+            <li>seats: Seat (relation)</li>
+        </ul>
+        <p>Relationer:</p>
+        <ul>
+            <li><strong>Cinema:</strong> many-to-one - En sal er en del af en specifik biograf.</li>
+            <li><strong>Schedule:</strong> one-to-many - En sal kan have flere visninger.</li>
+            <li><strong>Seat:</strong> one-to-many - En sal kan have flere sæder.</li>
+        </ul>
+    </div>
+
+    <div id="movie" class="entity-description">
+        <h3>Movie</h3>
+        <p>Attributter:</p>
+        <ul>
+            <li>id: int</li>
+            <li>title: string</li>
+            <li>description: string</li>
+            <li>releaseDate: LocalDate</li>
+            <li>duration: int</li>
+            <li>imageUrl: string</li>
+            <li>language: string</li>
+            <li>genre: string</li>
+            <li>director: string</li>
+            <li>cast: string</li>
+            <li>isActive: boolean</li>
+            <li>schedule: Schedule (relation)</li>
+        </ul>
+        <p>Relationer:</p>
+        <ul>
+            <li><strong>Schedule:</strong> one-to-many - En film kan have flere visninger.</li>
+        </ul>
+    </div>
+    <div id="moviePrice" class="entity-description">
+        <h3>MoviePrice</h3>
+        <p>Attributter:</p>
+        <ul>
+            <li>name: string (ID)</li>
+            <li>amount: double</li>
+            <li>unit: string</li>
+        </ul>
+    </div>
+    <div id="reservation" class="entity-description">
+        <h3>Reservation</h3>
+        <p>Attributter:</p>
+        <ul>
+            <li>id: int</li>
+            <li>schedule: Schedule (relation)</li>
+            <li>tickets: Ticket (relation)</li>
+            <li>reservationDate: LocalDate</li>
+            <li>feeOrDiscount: double</li>
+            <li>user: UserWithRoles (relation)</li>
+        </ul>
+        <p>Relationer:</p>
+        <ul>
+            <li><strong>Schedule:</strong> many-to-one - En reservation er knyttet til en specifik forestilling.</li>
+            <li><strong>Tickets:</strong> one-to-many - En reservation kan omfatte flere billetter.</li>
+            <li><strong>UserWithRoles:</strong> many-to-one - En reservation er knyttet til en specifik bruger, der har foretaget bookingen.</li>
+        </ul>
+    </div>
+    <div id="reservationPrice" class="entity-description">
+        <h3>ReservationPrice</h3>
+        <p>Attributter:</p>
+        <ul>
+            <li>name: string (ID)</li>
+            <li>amount: double</li>
+            <li>unit: string</li>
+        </ul>
+        <p>ReservationPrice repræsenterer prisen for en reservation.</p>
+    </div>
+    <div id="schedule" class="entity-description">
+        <h3>Schedule</h3>
+        <p>Attributter:</p>
+        <ul>
+            <li>id: Integer</li>
+            <li>startTime: LocalTime</li>
+            <li>endTime: LocalTime</li>
+            <li>date: LocalDate</li>
+            <li>is3d: boolean</li>
+            <li>isLongMovie: boolean</li>
+            <li>movie: Movie (relation)</li>
+            <li>hall: Hall (relation)</li>
+        </ul>
+        <p>Schedule repræsenterer en specifik filmvisning i en biograf.</p>
+        <p>Relationer:</p>
+        <ul>
+            <li><strong>Movie:</strong> many-to-one - En visning er knyttet til en specifik film.</li>
+            <li><strong>Hall:</strong> many-to-one - En visning finder sted i en specifik sal.</li>
+        </ul>
+    </div>
+    <div id="seat" class="entity-description">
+        <h3>Seat</h3>
+        <p>Attributter:</p>
+        <ul>
+            <li>id: int</li>
+            <li>seatIndex: int</li>
+            <li>seatPrice: SeatPrice (relation)</li>
+            <li>hall: Hall (relation)</li>
+            <li>isActive: boolean</li>
+        </ul>
+        <p>Seat repræsenterer et individuelt sæde i en biografsal.</p>
+        <p>Relationer:</p>
+        <ul>
+            <li><strong>SeatPrice:</strong> many-to-one - Et sæde kan have en specifik pris, der er defineret af en SeatPrice.</li>
+            <li><strong>Hall:</strong> many-to-one - Et sæde er placeret i en specifik sal.</li>
+        </ul>
+    </div>
+    <div id="seatPrice" class="entity-description">
+        <h3>SeatPrice</h3>
+        <p>Attributter:</p>
+        <ul>
+            <li>name: string (ID)</li>
+            <li>amount: double</li>
+            <li>unit: string</li>
+        </ul>
+        <p>SeatPrice repræsenterer prisen for et sæde</p>
+    </div>
+    <div id="ticket" class="entity-description">
+        <h3>Ticket</h3>
+        <p>Attributter:</p>
+        <ul>
+            <li>id: int</li>
+            <li>seat: Seat (relation)</li>
+            <li>price: double</li>
+            <li>reservation: Reservation (relation)</li>
+        </ul>
+        <p>Ticket repræsenterer en billet til en filmvisning.</p>
+        <p>Relationer:</p>
+        <ul>
+            <li><strong>Seat:</strong> many-to-one - En billet er knyttet til et specifikt sæde.</li>
+            <li><strong>Reservation:</strong> many-to-one - En billet er en del af en specifik reservation.</li>
+        </ul>
+    </div>
+
+
 </body>
 </html>
+
