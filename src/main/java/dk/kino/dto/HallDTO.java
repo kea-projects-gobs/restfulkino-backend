@@ -14,4 +14,5 @@ public class HallDTO {
     private int noOfColumns;
     private String imageUrl;
     private int cinemaId;
+    private boolean isActive;
 }

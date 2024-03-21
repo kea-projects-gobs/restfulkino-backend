@@ -33,7 +33,7 @@ public class HallServiceImpl implements HallService {
 
     @Override
     public List<HallDTO> findAll() {
-        return hallRepository.findAll().stream().map(this::convertHallToDTO).collect(Collectors.toList());
+        return hallRepository.findAllByIsActiveTrue().stream().map(this::convertHallToDTO).collect(Collectors.toList());
     }
 
     @Override
@@ -44,7 +44,7 @@ public class HallServiceImpl implements HallService {
 
     @Override
     public HallDTO findByNameAndCinemaName(String hallName, String cinemaName) {
-        Optional<Hall> hall = hallRepository.findByNameAndCinemaName(hallName,cinemaName);
+        Optional<Hall> hall = hallRepository.findByNameAndCinemaNameAndIsActiveTrue(hallName,cinemaName);
         return hall.map(this::convertHallToDTO).orElse(null);
     }
 
@@ -52,6 +52,7 @@ public class HallServiceImpl implements HallService {
     @Override
     public HallDTO createHall(HallDTO hallDTO) {
         Hall hall = convertToEntity(hallDTO);
+        hall.setActive(true);
         cinemaRepository.findById(hallDTO.getCinemaId()).ifPresent(hall::setCinema);
         Hall savedHall = hallRepository.save(hall);
         // CREATE SEATS
@@ -149,6 +150,7 @@ public class HallServiceImpl implements HallService {
         dto.setNoOfRows(hall.getNoOfRows());
         dto.setNoOfColumns(hall.getNoOfColumns());
         dto.setImageUrl(hall.getImageUrl());
+        dto.setActive(hall.isActive());
         if (hall.getCinema() != null){
             dto.setCinemaId(hall.getCinema().getId());
         }
@@ -163,13 +165,14 @@ public class HallServiceImpl implements HallService {
         hall.setNoOfRows(hallDTO.getNoOfRows());
         hall.setNoOfColumns(hallDTO.getNoOfColumns());
         hall.setImageUrl(hallDTO.getImageUrl());
+        hall.setActive(hallDTO.isActive());
         hall.setCinema(cinemaRepository.findById(hallDTO.getCinemaId()).orElse(null));
         return hall;
     }
 
     @Override
     public List<HallDTO> findHallsByCinemaId(int cinemaId) {
-        List<Hall> halls = hallRepository.findByCinemaId(cinemaId);
+        List<Hall> halls = hallRepository.findByCinemaIdAndIsActiveTrue(cinemaId);
         return halls.stream().map(this::convertHallToDTO).collect(Collectors.toList());
     }
 }
