@@ -95,7 +95,9 @@ public class HallServiceImpl implements HallService {
 
     @Override
     public void deleteHall(int id) {
-        hallRepository.deleteById(id);
+        Hall hall = hallRepository.findById(id).orElseThrow(() -> new RuntimeException("Hall not found"));
+        hall.setActive(false);
+        hallRepository.save(hall);
     }
 
     private Set<Seat> createSeats(Hall hall) {

@@ -38,6 +38,7 @@ public class Movie {
     private String director;
 
     private String cast;
+    private boolean isActive;
 
     @OneToMany(mappedBy = "movie")
     private List<Schedule> schedules;

@@ -31,6 +31,7 @@ public class Cinema {
     private String phone;
     private String email;
     private String imageUrl;
+    private boolean isActive;
 
     @OneToMany(mappedBy = "cinema", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Hall> halls;
