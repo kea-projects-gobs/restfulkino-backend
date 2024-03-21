@@ -12,6 +12,7 @@ public interface HallService {
 
     /**
      * Finds all halls.
+     * Only active halls are returned.
      *
      * @return List of all halls.
      */
@@ -19,6 +20,7 @@ public interface HallService {
 
     /**
      * Finds a <code>Hall</code> by its id.
+     * Only active halls are returned.
      *
      * @param id The id of the <code>Hall</code> object to find.
      * @return The <code>Hall</code> with the given id.
@@ -52,7 +54,7 @@ public interface HallService {
     HallDTO updateHall(int id, HallDTO hallDTO);
 
     /**
-     * Deletes a hall.
+     * Deletes a hall by setting it as inactive. All related seats are also set as inactive.
      *
      * @param id The id of the <code>Hall</code> object to delete.
      */

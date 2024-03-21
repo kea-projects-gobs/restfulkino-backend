@@ -14,6 +14,7 @@ import java.util.List;
 public interface CinemaService {
     /**
      * Finds all cinemas.
+     * Only active cinemas are returned.
      * 
      * 
      * @return List of all cinemas.
@@ -22,6 +23,7 @@ public interface CinemaService {
 
     /**
      * Finds a <code>Cinema</code> by its id.
+     * Only active cinemas are returned.
      * 
      * @param id The id of the <code>Cinema</code> object to find.
      * @return The <code>Cinema</code> with the given id.
@@ -47,7 +49,8 @@ public interface CinemaService {
     CinemaDTO updateCinema(int id, CinemaDTO cinemaDTO);
 
     /**
-     * Deletes a cinema.
+     * Deletes a cinema by setting it as inactive. All related halls are also set as inactive.
+     * 
      *
      * @param id The id of the <code>Cinema</code> object to delete.
      */
@@ -69,6 +72,7 @@ public interface CinemaService {
 
     /**
      * Finds all cinemas by movieId.
+     * 
      * @param movieId The id of the <code>Movie</code> object.
      * @return List of all cinemas showing the movie with the given id.
      */
