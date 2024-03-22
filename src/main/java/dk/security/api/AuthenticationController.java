@@ -88,6 +88,19 @@ public class AuthenticationController {
     }
   }
 
+  /**
+   * Logout the user and invalidates the token.
+   * <p>
+   * This method is used to invalidate the token provided in the Authorization header of the request.
+   * </p>
+   * <p>
+   * If the token is valid, it is removed from the token store and the user is logged out.
+   * <br>
+   * If the token is invalid or expired, the method will still return a successful response.
+   * </p>
+   * @param authHeader The Authorization header of the request.
+   * @return A response entity with a 200 OK status code.
+   */
   @PostMapping("/logout")
   @Operation(summary = "Logout", description = "Used to invalidate token on logout")
   public ResponseEntity<?> logout(@RequestHeader("Authorization") String authHeader) {
