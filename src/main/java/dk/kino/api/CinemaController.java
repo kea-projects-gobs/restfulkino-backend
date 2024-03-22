@@ -11,7 +11,7 @@ import java.util.List;
 @RequestMapping("/api/cinemas")
 public class CinemaController {
 
-    CinemaService cinemaService;
+    final CinemaService cinemaService;
 
     public CinemaController(CinemaService cinemaService) {
         this.cinemaService = cinemaService;
