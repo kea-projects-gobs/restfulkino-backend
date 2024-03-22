@@ -19,6 +19,10 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+/**
+ * Implementation of the {@link ReservationService} interface.
+ * Provides methods to calculate the price of a reservation and create a reservation.
+ */
 @Service
 public class ReservationServiceImpl implements ReservationService {
 
@@ -69,6 +73,12 @@ public class ReservationServiceImpl implements ReservationService {
         return seatService.findSeatsByHallId(hallDTO.getId());
     }
 
+    /**
+     * Builds a reservation based on the given reservation request DTO.
+     *
+     * @param reservationReqDTO  the reservation request DTO
+     * @return the built reservation
+     */
     private Reservation reservationBuilder(ReservationReqDTO reservationReqDTO) {
         // FEE OR DISCOUNT SETTINGS
         int NUMBER_OF_TICKETS_FOR_FEE = 6;
@@ -98,27 +108,25 @@ public class ReservationServiceImpl implements ReservationService {
         // Create tickets
         for (Ticket ticket : reservation.getTickets()) {
 
-            // Get seat id from seatIndex
-            int seatId = seatDTOs.stream()
-                    .filter(seat -> seat.getSeatIndex() == ticket.getSeat().getSeatIndex())
-                    .map(SeatDTO::getId)
-                    .findFirst().orElseThrow(() -> new NotFoundException("Seat is not found"));
-
-//            // Set seat id on ticket
-//            ticket.getSeat().setId(seatId);
+            // Get specific seat
+            SeatDTO seatDTO = seatDTOs.stream()
+                    .filter(seat -> seat.getSeatIndex() == ticket.getSeat().getSeatIndex()).findFirst().orElseThrow(() -> new NotFoundException("Seat is not found"));
+            int seatId = seatDTO.getId();
 
             // Validate seat is free
             if(seatIdsReserved.contains(seatId)) throw new BadRequestException("Seat is already taken");
 
-            // SET SEAT
-            SeatDTO seatDTO = seatService.findSeatById(seatId).orElseThrow(() -> new NotFoundException("Seat not found"));
+            // Set seat
             ticket.setSeat(seatService.toEntity(seatDTO));
 
+            // Get seat price
             double seatPrice = findSeatPriceByNameFromList(seatPrices,seatDTO.getSeatPriceName()).getAmount();
 
-            // SET PRICE
+            // Set ticket price
             double ticketPrice = seatPrice+ticketPriceAdjustment;
             ticket.setPrice(ticketPrice);
+
+            // Update total
             subTotal+=ticketPrice;
         }
 
@@ -132,30 +140,43 @@ public class ReservationServiceImpl implements ReservationService {
         return reservation;
     }
 
+    /**
+     * Calculates the price of a reservation based on the given reservation request DTO.
+     *
+     * @param reservationReqDTO  the reservation request DTO containing the details of the reservation
+     * @return the reservation price calculation DTO containing the calculated price information
+     */
     @Override
     public ReservationPriceCalcDTO calculatePrice(ReservationReqDTO reservationReqDTO) {
         Reservation reservation = reservationBuilder(reservationReqDTO);
-
-        for (Ticket ticket : reservation.getTickets()) {
-            ticket.setReservation(reservation);
-        }
-
         return toReservationPriceCalcDTO(reservation);
     }
 
+    /**
+     * Creates a reservation based on the provided reservation request DTO and the authenticated principal.
+     *
+     * @param reservationReqDTO  the reservation request DTO containing the details of the reservation to be created
+     * @param principal          the authenticated principal representing the user creating the reservation
+     * @return the reservation response DTO containing the details of the created reservation
+     */
     @Override
     @Transactional
     public ReservationResDTO createReservation(ReservationReqDTO reservationReqDTO, Principal principal) {
         Reservation reservation = reservationBuilder(reservationReqDTO);
 
-        // ADD user
+        // Get user
         String currentUserName = principal.getName();
         userWithRolesService.getUserWithRoles(currentUserName);
         UserWithRoles userWithRoles = new UserWithRoles();
         userWithRoles.setUsername(currentUserName);
+
+        // Set user on reservation
         reservation.setUser(userWithRoles);
 
+        // Persist reservation
         Reservation savedReservation = reservationRepository.save(reservation);
+
+        // Persist tickets
         for (Ticket ticket : reservation.getTickets()) {
             ticket.setReservation(savedReservation);
         }
