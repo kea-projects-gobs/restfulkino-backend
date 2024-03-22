@@ -45,7 +45,7 @@ public class HallController {
         return ResponseEntity.ok(halls);
     }
 
-    @Operation(summary = "Add a hall", description = "Creates a new hall.")
+    @Operation(summary = "Create a hall", description = "Creates a new hall.")
     @PostMapping
     public ResponseEntity<HallDTO> addHall(@RequestBody HallDTO hallDTO) {
         HallDTO createHall = hallService.createHall(hallDTO);

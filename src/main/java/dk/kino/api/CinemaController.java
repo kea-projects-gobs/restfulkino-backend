@@ -49,7 +49,7 @@ public class CinemaController {
         return ResponseEntity.ok(cinemas);
     }
 
-    @Operation(summary = "Add a cinema", description = "Creates a new cinema.")
+    @Operation(summary = "Create a cinema", description = "Creates a new cinema.")
     @PostMapping
     public ResponseEntity<CinemaDTO> addCinema(@RequestBody CinemaDTO cinemaDTO) {
         CinemaDTO createCinema = cinemaService.createCinema(cinemaDTO);

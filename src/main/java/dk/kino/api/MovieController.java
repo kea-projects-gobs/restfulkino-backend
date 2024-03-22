@@ -33,7 +33,7 @@ public class MovieController {
         return ResponseEntity.ok(movieService.findById(id).orElseThrow(() -> null));
     }
 
-    @Operation(summary = "Add movie", description = "Creates a new movie")
+    @Operation(summary = "Create a movie", description = "Creates a new movie")
     @PostMapping
     public ResponseEntity<MovieDTO> addMovie(@RequestBody MovieDTO movieDTO) {
         return ResponseEntity.status(HttpStatus.CREATED).body(movieService.create(movieDTO));
