@@ -138,7 +138,7 @@ public class SetupData implements ApplicationRunner {
 
             LocalDate today = LocalDate.now();
             int movieIndex = 0; // Start with the first movie
-            for (int dayOffset = 0; dayOffset < 5; dayOffset++) {
+            for (int dayOffset = 0; dayOffset < 20; dayOffset++) {
                 LocalDate scheduleDate = today.plusDays(dayOffset);
             
                 for (Cinema cinema : cinemas) {
