@@ -10,8 +10,6 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 import dk.kino.service.*;
-import dk.kino.service.CinemaService;
-import dk.kino.service.HallService;
 import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.ApplicationRunner;
 import org.springframework.stereotype.Component;
