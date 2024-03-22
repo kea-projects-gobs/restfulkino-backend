@@ -47,66 +47,52 @@ public class ReservationServiceImpl implements ReservationService {
         this.userWithRolesService = userWithRolesService;
     }
 
-    private List<MoviePrice> getMoviePrices() {
-        return moviePriceService.findAllMoviePrices();
-    }
-
-    private List<ReservationPrice> getReservationPrices() {
-        return reservationPriceService.findAllReservationPrices();
-    }
-
-    private List<SeatPrice> getSeatPrices() {
-        return seatPriceService.findAllSeatPrices();
-    }
-
-    private MoviePrice findMoviePriceByNameFromList(List<MoviePrice> moviePrices, String name) {
-        return moviePrices.stream()
-                .filter(seatPrice -> name.equalsIgnoreCase(seatPrice.getName()))
-                .findFirst()
-                .orElse(null);
-    }
-
-    private ReservationPrice findReservationPriceByNameFromList(List<ReservationPrice> reservationPrices, String name) {
-        return reservationPrices.stream()
-                .filter(seatPrice -> name.equalsIgnoreCase(seatPrice.getName()))
-                .findFirst()
-                .orElse(null);
-    }
-
     private SeatPrice findSeatPriceByNameFromList(List<SeatPrice> seatPrices, String name) {
         return seatPrices.stream()
                 .filter(seatPrice -> name.equalsIgnoreCase(seatPrice.getName()))
                 .findFirst()
-                .orElse(null);
+                .orElseThrow(() -> new NotFoundException("Price not found"));
     }
 
-    @Override
-    public ReservationPriceCalcDTO calculatePrice(ReservationReqDTO reservationReqDTO) {
-        // GET PRICES
-        List<SeatPrice> seatPrices = getSeatPrices();
-        List<MoviePrice> moviePrices = getMoviePrices();
-        List<ReservationPrice> reservationPrices = getReservationPrices();
-
-        double PRICE_LONG_MOVIE = findMoviePriceByNameFromList(moviePrices,"longMovie").getAmount();
-        double PRICE_3D = findMoviePriceByNameFromList(moviePrices,"threeD").getAmount();
-        double FEE = findReservationPriceByNameFromList(reservationPrices,"fee").getAmount();
-        double DISCOUNT = findReservationPriceByNameFromList(reservationPrices,"discount").getAmount();
-
-
-        double TICKET_PRICE_ADJUSTMENT = 0;
-
-        Reservation reservation = toEntity(reservationReqDTO);
-        ScheduleDTO scheduleDTO = scheduleService.findById(reservation.getSchedule().getId()).orElseThrow(() -> new NotFoundException("Schedule not found"));
-        HallDTO hallDTO = hallService.findByNameAndCinemaName(scheduleDTO.getHallName(),scheduleDTO.getCinemaName());
-        List<SeatDTO> seatDTOs = seatService.findSeatsByHallId(hallDTO.getId());
-
+    private double getTicketPriceAdjustment(ScheduleDTO scheduleDTO) {
+        double ticketPriceAdjustment = 0;
+        double priceLongMovie = moviePriceService.findMoviePriceByName("longMovie").orElseThrow(() -> new NotFoundException("Price not found")).getAmount();
+        double price3D = moviePriceService.findMoviePriceByName("threeD").orElseThrow(() -> new NotFoundException("Price not found")).getAmount();
         // Adjust prices
-        if(scheduleDTO.isLongMovie()) TICKET_PRICE_ADJUSTMENT+=PRICE_LONG_MOVIE;
-        if(scheduleDTO.is3d()) TICKET_PRICE_ADJUSTMENT+=PRICE_3D;
+        if(scheduleDTO.isLongMovie()) ticketPriceAdjustment+=priceLongMovie;
+        if(scheduleDTO.is3d()) ticketPriceAdjustment+=price3D;
+        return ticketPriceAdjustment;
+    }
 
-        // Get reserved seats
+    private List<SeatDTO> getHallSeats(ScheduleDTO scheduleDTO) {
+        HallDTO hallDTO = hallService.findByNameAndCinemaName(scheduleDTO.getHallName(),scheduleDTO.getCinemaName());
+        return seatService.findSeatsByHallId(hallDTO.getId());
+    }
+
+    private Reservation reservationBuilder(ReservationReqDTO reservationReqDTO) {
+        // FEE OR DISCOUNT SETTINGS
+        int NUMBER_OF_TICKETS_FOR_FEE = 6;
+        int NUMBER_OF_TICKETS_FOR_DISCOUNT = 11;
+
+        // Convert to entity
+        Reservation reservation = toEntity(reservationReqDTO);
+
+        // Get prices
+        List<SeatPrice> seatPrices = seatPriceService.findAllSeatPrices();
+        double feeFraction = reservationPriceService.findReservationPriceByName("fee").orElseThrow(() -> new NotFoundException("Price not found")).getAmount();
+        double discountFraction = reservationPriceService.findReservationPriceByName("discount").orElseThrow(() -> new NotFoundException("Price not found")).getAmount();
+
+        // Get Schedule
+        ScheduleDTO scheduleDTO = scheduleService.findById(reservation.getSchedule().getId()).orElseThrow(() -> new NotFoundException("Schedule not found"));
+
+        // Get price adjustments for ticket
+        double ticketPriceAdjustment = getTicketPriceAdjustment(scheduleDTO);
+
+        // Get seats
+        List<SeatDTO> seatDTOs = getHallSeats(scheduleDTO);
         List<Integer> seatIdsReserved = getReservedSeatIdsByScheduleId(scheduleDTO.getId());
 
+        // Keep track of total for adding fees or discount
         double subTotal = 0;
 
         // Create tickets
@@ -118,34 +104,41 @@ public class ReservationServiceImpl implements ReservationService {
                     .map(SeatDTO::getId)
                     .findFirst().orElseThrow(() -> new NotFoundException("Seat is not found"));
 
-            // Set seat id on ticket
-            ticket.getSeat().setId(seatId);
+//            // Set seat id on ticket
+//            ticket.getSeat().setId(seatId);
 
+            // Validate seat is free
             if(seatIdsReserved.contains(seatId)) throw new BadRequestException("Seat is already taken");
 
             // SET SEAT
             SeatDTO seatDTO = seatService.findSeatById(seatId).orElseThrow(() -> new NotFoundException("Seat not found"));
-
             ticket.setSeat(seatService.toEntity(seatDTO));
 
             double seatPrice = findSeatPriceByNameFromList(seatPrices,seatDTO.getSeatPriceName()).getAmount();
 
             // SET PRICE
-            double ticketPrice = seatPrice+TICKET_PRICE_ADJUSTMENT;
+            double ticketPrice = seatPrice+ticketPriceAdjustment;
             ticket.setPrice(ticketPrice);
             subTotal+=ticketPrice;
         }
 
-        if(reservation.getTickets().size() < 6) reservation.setFeeOrDiscount(roundToTwoDecimalPlaces(subTotal*FEE));
-        if(reservation.getTickets().size() > 10) reservation.setFeeOrDiscount(roundToTwoDecimalPlaces(-subTotal*DISCOUNT));
+        // SET FEE OR DISCOUNT
+        if(reservation.getTickets().size() < NUMBER_OF_TICKETS_FOR_FEE) reservation.setFeeOrDiscount(roundToTwoDecimalPlaces(subTotal*feeFraction));
+        if(reservation.getTickets().size() >= NUMBER_OF_TICKETS_FOR_DISCOUNT) reservation.setFeeOrDiscount(roundToTwoDecimalPlaces(-subTotal*discountFraction));
 
+        // ADD RESERVATION DATE
         reservation.setReservationDate(LocalDate.now());
 
-//        Reservation savedReservation = reservationRepository.save(reservation);
+        return reservation;
+    }
+
+    @Override
+    public ReservationPriceCalcDTO calculatePrice(ReservationReqDTO reservationReqDTO) {
+        Reservation reservation = reservationBuilder(reservationReqDTO);
+
         for (Ticket ticket : reservation.getTickets()) {
             ticket.setReservation(reservation);
         }
-//        ticketService.createTickets(reservation.getTickets().stream().map(ticketService::toDto).collect(Collectors.toList()));
 
         return toReservationPriceCalcDTO(reservation);
     }
@@ -153,66 +146,9 @@ public class ReservationServiceImpl implements ReservationService {
     @Override
     @Transactional
     public ReservationResDTO createReservation(ReservationReqDTO reservationReqDTO, Principal principal) {
-        // GET PRICES
-        List<SeatPrice> seatPrices = getSeatPrices();
-        List<MoviePrice> moviePrices = getMoviePrices();
-        List<ReservationPrice> reservationPrices = getReservationPrices();
-
-        double PRICE_LONG_MOVIE = findMoviePriceByNameFromList(moviePrices,"longMovie").getAmount();
-        double PRICE_3D = findMoviePriceByNameFromList(moviePrices,"threeD").getAmount();
-        double FEE = findReservationPriceByNameFromList(reservationPrices,"fee").getAmount();
-        double DISCOUNT = findReservationPriceByNameFromList(reservationPrices,"discount").getAmount();
-
-        double TICKET_PRICE_ADJUSTMENT = 0;
-
-        Reservation reservation = toEntity(reservationReqDTO);
-        ScheduleDTO scheduleDTO = scheduleService.findById(reservation.getSchedule().getId()).orElseThrow(() -> new NotFoundException("Schedule not found"));
-        HallDTO hallDTO = hallService.findByNameAndCinemaName(scheduleDTO.getHallName(),scheduleDTO.getCinemaName());
-        List<SeatDTO> seatDTOs = seatService.findSeatsByHallId(hallDTO.getId());
-
-        // Adjust prices
-        if(scheduleDTO.isLongMovie()) TICKET_PRICE_ADJUSTMENT+=PRICE_LONG_MOVIE;
-        if(scheduleDTO.is3d()) TICKET_PRICE_ADJUSTMENT+=PRICE_3D;
-
-        // Get reserved seats
-        List<Integer> seatIdsReserved = getReservedSeatIdsByScheduleId(scheduleDTO.getId());
-
-        double subTotal = 0;
-
-        // Create tickets
-        for (Ticket ticket : reservation.getTickets()) {
-
-            // Get seat id from seatIndex
-            int seatId = seatDTOs.stream()
-                    .filter(seat -> seat.getSeatIndex() == ticket.getSeat().getSeatIndex())
-                    .map(SeatDTO::getId)
-                    .findFirst().orElseThrow(() -> new NotFoundException("Seat is not found"));
-
-            // Set seat id on ticket
-            ticket.getSeat().setId(seatId);
-
-            if(seatIdsReserved.contains(seatId)) throw new BadRequestException("Seat is already taken");
-
-            // SET SEAT
-            SeatDTO seatDTO = seatService.findSeatById(seatId).orElseThrow(() -> new NotFoundException("Seat not found"));
-
-            ticket.setSeat(seatService.toEntity(seatDTO));
-
-            double seatPrice = findSeatPriceByNameFromList(seatPrices,seatDTO.getSeatPriceName()).getAmount();
-
-            // SET PRICE
-            double ticketPrice = seatPrice+TICKET_PRICE_ADJUSTMENT;
-            ticket.setPrice(ticketPrice);
-            subTotal+=ticketPrice;
-        }
-
-        if(reservation.getTickets().size() < 6) reservation.setFeeOrDiscount(roundToTwoDecimalPlaces(subTotal*FEE));
-        if(reservation.getTickets().size() > 10) reservation.setFeeOrDiscount(roundToTwoDecimalPlaces(-subTotal*DISCOUNT));
-
-        reservation.setReservationDate(LocalDate.now());
+        Reservation reservation = reservationBuilder(reservationReqDTO);
 
         // ADD user
-
         String currentUserName = principal.getName();
         userWithRolesService.getUserWithRoles(currentUserName);
         UserWithRoles userWithRoles = new UserWithRoles();
