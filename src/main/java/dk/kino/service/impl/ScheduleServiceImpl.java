@@ -5,6 +5,8 @@ import dk.kino.dto.ScheduleDTO;
 import dk.kino.entity.Hall;
 import dk.kino.entity.Movie;
 import dk.kino.entity.Schedule;
+import dk.kino.exception.BadRequestException;
+import dk.kino.exception.NotFoundException;
 import dk.kino.repository.ScheduleRepository;
 import dk.kino.service.MovieService;
 import dk.kino.service.ScheduleService;
@@ -62,7 +64,7 @@ public class ScheduleServiceImpl implements ScheduleService {
     @Override
     public ScheduleDTO update(int id, ScheduleDTO scheduleDTO) {
         // Find schedule
-        Schedule originalSchedule = scheduleRepository.findById(id).orElseThrow(() -> new RuntimeException(("Unable to find schedule with id=" + id)));
+        Schedule originalSchedule = scheduleRepository.findById(id).orElseThrow(() -> new NotFoundException(("Unable to find schedule with id=" + id)));
 
         // Map to entity
         Schedule schedule = toEntity(scheduleDTO);
@@ -92,18 +94,18 @@ public class ScheduleServiceImpl implements ScheduleService {
                 schedule.getId() != null ? schedule.getId() : -1 // Passes the current schedule's ID (so that we can PUT this) and uses -1 if null
         );
         if (countConflicts>0) {
-            throw new RuntimeException("Schedule already exists.");
+            throw new BadRequestException("Schedule already exists.");
         }
     }
 
     private boolean isLongMovie(Schedule schedule) {
-        MovieDTO movieDTO = movieService.findById(schedule.getMovie().getId()).orElseThrow(() -> new RuntimeException(("Unable to find movie")));
+        MovieDTO movieDTO = movieService.findById(schedule.getMovie().getId()).orElseThrow(() -> new NotFoundException(("Unable to find movie")));
         return movieDTO.getDuration()>170;
     }
 
     @Override
     public void delete(int id) {
-        Schedule schedule = scheduleRepository.findById(id).orElseThrow(() -> new RuntimeException(("Unable to find schedule with id=" + id)));
+        Schedule schedule = scheduleRepository.findById(id).orElseThrow(() -> new NotFoundException(("Unable to find schedule with id=" + id)));
         scheduleRepository.delete(schedule);
     }
 
