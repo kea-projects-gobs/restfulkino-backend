@@ -32,27 +32,22 @@ To set up the project locally, follow these steps:
 git clone https://github.com/kea-projects-gobs/restfulkino-backend.git
 ```
 
-2. Install dependencies
+2. Create a .env file and paste the following / or set the following environment variables directly in intelliJ
 ```bash
-mvn install
-```
-
-3. Create a .env file and paste the following / or set the following environment variables directly in intelliJ
-```bash
-JDBC_DATABASE_URL=jdbc:mysql://localhost:3306/[mysql_dbname]
-JDBC_DATABASE_USERNAME=[username for your local db]
-JDBC_DATABASE_PASSWORD=[password for your local db]
+JDBC_DATABASE_URL=jdbc:mysql://localhost:3306/your_mysql_dbname
+JDBC_DATABASE_USERNAME=username for your local db
+JDBC_DATABASE_PASSWORD=password for your local db
 TOKEN_SECRET=
 ```
 
-4. To generate a token secret, run the following command in your terminal
+3. To generate a token secret, run the following command in your terminal
 ```bash
 openssl rand -base64 32
 ```
 
-5. Run the application
+4. Run the application
 ```bash
-mvn spring-boot:run
+./mvnw spring-boot:run
 ```
 
 
