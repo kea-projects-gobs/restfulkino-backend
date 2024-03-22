@@ -40,7 +40,7 @@ public class SetupData implements ApplicationRunner {
     }
 
     @Override
-    public void run(ApplicationArguments args) throws Exception {
+    public void run(ApplicationArguments args) {
         initData();
     }
 

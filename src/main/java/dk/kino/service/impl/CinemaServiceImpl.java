@@ -19,9 +19,9 @@ import java.util.stream.Collectors;
 @Service
 public class CinemaServiceImpl implements CinemaService {
 
-    private CinemaRepository cinemaRepository;
-    private HallService hallService;
-    private ScheduleRepository scheduleRepository;
+    private final CinemaRepository cinemaRepository;
+    private final HallService hallService;
+    private final ScheduleRepository scheduleRepository;
 
     public CinemaServiceImpl(CinemaRepository cinemaRepository, HallService hallService, ScheduleRepository scheduleRepository) {
         this.cinemaRepository = cinemaRepository;

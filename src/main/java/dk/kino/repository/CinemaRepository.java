@@ -7,7 +7,7 @@ import java.util.List;
 import java.util.Optional;
 
 public interface CinemaRepository extends JpaRepository<Cinema, Integer> {
-    public Optional<Cinema> findByName(String name);
+    Optional<Cinema> findByName(String name);
     List<Cinema> findAllByIsActiveTrue();
 
 }
