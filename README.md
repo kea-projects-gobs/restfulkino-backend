@@ -12,9 +12,9 @@ Group project made by [Benjamin](https://github.com/Benjamin-Harris1), [Gustav](
 ## Technologies used
 
 - **Spring Boot**
+- **Spring Security**
 - **Maven**
 - **MySQL**
-- **Lombok**
 - **JWT**
 
 ## API Documentation
@@ -22,6 +22,13 @@ Group project made by [Benjamin](https://github.com/Benjamin-Harris1), [Gustav](
 For detailed information about the API endpoints:
 - Run the application locally
 - Go to [http://localhost:8080/swagger-ui/index.html](http://localhost:8080/swagger-ui/index.html)
+
+## JavaDocs
+For detailed information about the Java code:
+- Generate JavaDocs by running the following command in the terminal
+```bash
+./mvnw javadoc:javadoc
+```
 
 ## Installation 
 
