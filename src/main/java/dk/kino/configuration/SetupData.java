@@ -41,7 +41,8 @@ public class SetupData implements ApplicationRunner {
 
     @Override
     public void run(ApplicationArguments args) {
-        initData();
+        // Uncomment the line below to initialize the database with some data (remember to change spring.jpa.hibernate.ddl-auto to create in application.properties)
+        //initData();
     }
 
 
