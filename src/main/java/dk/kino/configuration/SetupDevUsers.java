@@ -28,9 +28,10 @@ public class SetupDevUsers implements ApplicationRunner {
     }
 
     public void run(ApplicationArguments args) {
-        setupAllowedRoles();
-        setupUserWithRoleUsers();
-        setupEmployee();
+        // Uncomment the lines below to setup default users and roles (remember to change spring.jpa.hibernate.ddl-auto to create in application.properties)
+        //setupAllowedRoles();
+        //setupUserWithRoleUsers();
+        //setupEmployee();
     }
 
     private void setupAllowedRoles(){
